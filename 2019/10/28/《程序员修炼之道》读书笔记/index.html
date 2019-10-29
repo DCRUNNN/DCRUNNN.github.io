@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>《程序员修炼之道》读书笔记 | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">《程序员修炼之道》读书笔记</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">《程序员修炼之道》读书笔记</h1><div class="post-meta">Oct 28, 2019<span> | </span><span class="category"><a href="/categories/读书笔记/">读书笔记</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#第一章-注重实效的哲学"><span class="toc-text">第一章 注重实效的哲学</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-我的源码让猫给吃了"><span class="toc-text">1. 我的源码让猫给吃了</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-软件的熵"><span class="toc-text">2. 软件的熵</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-石头汤与煮青蛙"><span class="toc-text">3. 石头汤与煮青蛙</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-足够好的软件"><span class="toc-text">4. 足够好的软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-你的知识资产"><span class="toc-text">5. 你的知识资产</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-交流"><span class="toc-text">6. 交流</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第二章-注重实效的途径"><span class="toc-text">第二章 注重实效的途径</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-重复的危害"><span class="toc-text">7. 重复的危害</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-正交性"><span class="toc-text">8. 正交性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-可撤销性"><span class="toc-text">9. 可撤销性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-曳光弹"><span class="toc-text">10. 曳光弹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-原型与便笺"><span class="toc-text">11. 原型与便笺</span></a></li></ol></li></ol></div></div><div class="post-content"><h1 id="第一章-注重实效的哲学"><a href="#第一章-注重实效的哲学" class="headerlink" title="第一章 注重实效的哲学"></a>第一章 注重实效的哲学</h1><h2 id="1-我的源码让猫给吃了"><a href="#1-我的源码让猫给吃了" class="headerlink" title="1. 我的源码让猫给吃了"></a>1. 我的源码让猫给吃了</h2><ul>
+<li>在所有的弱点中，最大的弱点就是害怕暴露弱点</li>
+<li>提供各种选择，不要找蹩脚的借口。</li>
+<li>如存在供应商不能按时供货的风险，应该预先制定一份应急计划；如果磁盘垮了，带走了源码，而你没有做备份，那是你的错。</li>
+<li>注重实效的程序员应该提供解决方案，而非寻找借口。</li>
+</ul>
+<h2 id="2-软件的熵"><a href="#2-软件的熵" class="headerlink" title="2. 软件的熵"></a>2. 软件的熵</h2><ul>
+<li>物理学中，熵指的是某个系统中无序的总量。热力学定律保证了宇宙中的熵倾向于最大化。</li>
+<li>当软件中的无序增长时，程序员们称之为软件腐烂。</li>
+<li><strong>破窗理论</strong>：不要容忍破窗户（低劣的设计、错误决策、或是糟糕的代码），发现一个就修一个，如果没有足够的时间进行适当的修理，就用木板把它钉起来。或许你可以把出问题的代码放入注释，或是显示“未实现”消息，或是用虚设的数据加以替代。总之，采取某种行动防止进一步的损坏，并说明情势处在你的控制之下。</li>
+</ul>
+<h2 id="3-石头汤与煮青蛙"><a href="#3-石头汤与煮青蛙" class="headerlink" title="3. 石头汤与煮青蛙"></a>3. 石头汤与煮青蛙</h2><ul>
+<li>做变化的催化剂。参与正在发生的成功要更容易，让他们瞥见未来，你就能让他们聚集在你周围。</li>
+<li>记住大图景，要持续不断地观察周围发生的事情，而不只是你自己在做的事情。</li>
+</ul>
+<h2 id="4-足够好的软件"><a href="#4-足够好的软件" class="headerlink" title="4. 足够好的软件"></a>4. 足够好的软件</h2><ul>
+<li>使质量称为需求问题。你所制作的系统的范围和质量应该作为系统需求的一部分规定下来。</li>
+<li>不要因为过度修饰和过于求精二毁损完好的程序。继续前进，让你的代码凭着自己的质量站立一会儿。它也许不完美，但不用担心：它不可能完美。</li>
+</ul>
+<h2 id="5-你的知识资产"><a href="#5-你的知识资产" class="headerlink" title="5. 你的知识资产"></a>5. 你的知识资产</h2><ul>
+<li>把程序员所知道的关于计算技术和他们所工作的应用领域的全部事实、以及他们的所有经验视为他们的知识资产。</li>
+<li>经营你的资产，定期为你的知识资产投资：<ul>
+<li>定期投资：定期为你的知识资产投资</li>
+<li>多元化：你掌握的技术越多，你就越能更好地进行调整，赶上计算技术的变化。</li>
+<li>管理风险：不要把你所有的技术鸡蛋都放在一个篮子里。</li>
+<li>低买高卖：在新兴的技术流行之前学习它可能就和找到被低估的股票一样困难，但所得到的就和那样的股票带来的收益一样。</li>
+<li>重新评估和平衡技术</li>
+</ul>
+</li>
+<li>建议：<ul>
+<li>每年至少学习一种新语言</li>
+<li>每季度阅读一本技术书籍</li>
+<li>也要阅读非技术书籍</li>
+<li>上课</li>
+<li>参加本地用户组织</li>
+<li>试验不同的环境</li>
+<li>跟上潮流：订阅商务杂志和其他期刊</li>
+<li>上网查看技术信息</li>
+<li>持续投入，学习的过程将扩展思维，使你想着新的可能性和新的做事方式拓展。</li>
+<li>设法把你学到的东西应用在你当前的项目中，即使你的项目没有使用该技术，但你或许也能借鉴一些想法，如面向对象。</li>
+</ul>
+</li>
+<li>批判地分析你读到的和听到的，web搜索引擎把某个页面列在最前面，并不意味着那就是最佳选择。</li>
+</ul>
+<h2 id="6-交流"><a href="#6-交流" class="headerlink" title="6. 交流"></a>6. 交流</h2><ul>
+<li>知道你想要说什么：规划你想要说的东西，写出大纲，然后问你自己：“这是否讲清了我要说的所有内容？”提炼它，直到确实如此为止。</li>
+<li>了解你的听众：需要了解你的听众的需要、兴趣、能力。</li>
+<li>选择时机：弄清楚听众的轻重缓急是什么，要让你所说的适得其时，在内容上切实相关，有时候，只要简单地问一句“现在我们可以谈谈……吗？”就可以了。</li>
+<li>选择交流风格，让其适应你的听众：正式的事实简报、书面文档、电子邮件等</li>
+<li>让文档美观：让内容以美观的方式传递给你的听众</li>
+<li>让听众参与：让你的读者参与文档的早期草稿的制作，获取他们的反馈，并汲取他们的智慧，你讲建立良好的工作关系，并很可能在此过程中制作出更好的文档。</li>
+<li>做倾听者：你想要大家听你讲话，你也要听他们说话。</li>
+<li>回复他人：及时回复消息，即使内容只是“我稍后回复你”<ul>
+<li>你说什么和你怎么说同样重要</li>
+</ul>
+</li>
+</ul>
+<h1 id="第二章-注重实效的途径"><a href="#第二章-注重实效的途径" class="headerlink" title="第二章 注重实效的途径"></a>第二章 注重实效的途径</h1><h2 id="7-重复的危害"><a href="#7-重复的危害" class="headerlink" title="7. 重复的危害"></a>7. 重复的危害</h2><ul>
+<li>DRY原则：Don’t Repeat Yourself，系统的每一项知识都必须具有单一、无歧义、权威的表示<ul>
+<li>如果有多处重复，当改变其中一处时，必须改变其他各处，不便于维护</li>
+</ul>
+</li>
+<li>强加的重复<ul>
+<li>信息的多种表示：编写简单的过滤器或代码生成器，根据公共的元数据表示构建多种语言下的结构。可以根据在线数据库schema、或是最初用于构建schema的元数据，自动生成类定义。</li>
+<li>代码中的文档：糟糕的代码才需要许多注释。把低级的知识放在代码中，把注释保留给其他的高级说明，否则就是在重复知识，而每一次改变都意味着既要改变代码也要改变注释，注释将不可避免地变得过时，而不可信任的注释比完全没有注释更糟。</li>
+<li>文档和代码：文档和代码都含有同一知识的表示，当ddl逼近时，我们往往会推迟文档的更新。尝试根据文档自动生成测试套件？</li>
+<li>语言问题：应该用头文件记在接口问题，用实现文件记载代码的使用者无须了解的实际细节。</li>
+</ul>
+</li>
+<li>无意的重复<ul>
+<li>线段类有start、end和length属性，但是length重复了，因为长度是由起点和终点决定的，最好让长度成为计算字段，将length属性改变为方法length()，返回start和end点之间的距离。</li>
+<li>可以因为性能原因而选择违反DRY原则，如当你需要缓存数据以避免重复昂贵的操作时，其诀窍是使影响局部化。对DRY原则的违反没有暴露给外界。</li>
+<li>在可能的情况下，应该总是用访问器（getter、setter）函数来读写对象的属性。</li>
+</ul>
+</li>
+<li>无耐性的重复<ul>
+<li>copy原来的代码？想一想古老的格言：欲速则不达</li>
+</ul>
+</li>
+<li>开发者之间的重复<ul>
+<li>鼓励开发者相互进行交流，设置论坛，用于讨论常见问题。让某个团队成员担任项目资料管理员以促进知识的交流。在源码树中指定一个中央区域，用于存放实用例程和脚本。</li>
+<li><strong>让复用变得容易</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="8-正交性"><a href="#8-正交性" class="headerlink" title="8. 正交性"></a>8. 正交性</h2><ul>
+<li>在几何学中，如果两条直线相交成直角，它们就是正交的。用向量术语说，这两条直线互补依赖，沿着某一条直线移动，你投影到另一条直线上的位置不变。</li>
+<li>在计算技术中，正交用于表示某种不相依赖性或是解耦性，如果两个或更多事物中的一个发生变化，不会影响其他事物，这些事物就是正交的。<ul>
+<li>如数据库代码应该与用户界面正交</li>
+<li>当任何系统的各组件互相高度依赖时，就不再有局部修正这样的事情。</li>
+</ul>
+</li>
+<li><strong>消除无关事物之间的影响</strong></li>
+<li>想要设计自足的组件：独立，具有单一、良好定义的目的（内聚）。</li>
+<li>正交的系统的两个主要好处：提高生产率，降低风险</li>
+<li>团队也应注重正交性，划分为责任得到良好定义的小组，并使得重叠降至最低。</li>
+<li>设计正交组件：问问自己：如果显著地改变某个特定功能背后的需求，有多少模块会受影响？在正交系统中答案应该是一个。<ul>
+<li>不要依赖你无法控制的事物属性</li>
+</ul>
+</li>
+<li>在引入第三方工具箱和库时，要注意保持系统的正交性。</li>
+<li>编码时，应用若干技术用于维持正交性：<ul>
+<li>让你的代码保持解耦，不要没有必要地向其他模块暴露任何事情，也不依赖其他模块的实现</li>
+<li>避免使用全局数据：如果把你所需的任何语境（context上下文）显式地传入模块，你的代码就会更易于理解和维护。</li>
+<li>避免编写相似的函数：可以使用策略模式</li>
+</ul>
+</li>
+<li>正交的系统也更易于测试，修正bug也是评估整个系统正交性的好时候</li>
+<li>正交性也适用于文档，其坐标轴是内容和表现形式。</li>
+</ul>
+<h2 id="9-可撤销性"><a href="#9-可撤销性" class="headerlink" title="9. 可撤销性"></a>9. 可撤销性</h2><ul>
+<li><strong>不存在最终决策</strong></li>
+<li>灵活的架构：定义良好的抽象接口、引入元数据，并且使用某种自动机制（如Aspect）——把必需的语句插入代码自身。</li>
+</ul>
+<h2 id="10-曳光弹"><a href="#10-曳光弹" class="headerlink" title="10. 曳光弹"></a>10. 曳光弹</h2><ul>
+<li><strong>用曳光弹找到目标</strong></li>
+<li>做大型项目时，先出一个简陋可运行可展示的版本。不要在黑夜中盲狙，先完成一部分可用功能再集成其他功能</li>
+<li>曳光代码 vs 原型制作：原型制作生成用过就扔的代码，而曳光代码虽然简约，却是完整的，并且构成了最终系统的骨架的一部分。可以把原型制作视为在第一发曳光弹发射之前进行的侦查和情报搜集工作。</li>
+</ul>
+<h2 id="11-原型与便笺"><a href="#11-原型与便笺" class="headerlink" title="11. 原型与便笺"></a>11. 原型与便笺</h2></div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/10/28/《程序员修炼之道》读书笔记/" data-id="ck2bfcess001j6oub084t3qui" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACxUlEQVR42u3a0U7DMAwFUP7/p0HiCWm0uzdONpBOnyZW2pw8xJ7tj4/4+vy+2ns+f1yP9zx+vrr/8e+bLzw8PLylpV9d90tpqe1Krp6QrBkPDw/vNO9+ick9yaLbJ6/9Fx4eHt7f4RXH8SA1T0ILHh4e3n/h3R/cdbIbp9H3QQIPDw/vXbykGLFWqsiDytpbttVa8PDw8KbZbxQk3vX5YH8PDw8Pb9BVzw/fPLHOy7Vtsv7Lu/Dw8PAO8PJRgLyIkA8N5MMBeWMs6r/h4eHhbeKtHdnzAkHe6GqLGnh4eHjneG27KwkheTK9tpVtEMLDw8PbxcsfkZch2m/rIz7/SYCHh4d3jDdPlyct/7V7isCAh4eHd4CXFCNadl6WnQSSJz8J8PDw8I7x2sZSPkyQJ8dt2yz6Fg8PD+8Ar02X11pWk3ZXm2TXNQ88PDy8JV6b2rbNs6TF1SIXB7Dw8PDwxrw8Od7bxJoc8UkS/0utBQ8PD28TLy8xJIw2pc7DyXzACw8PD28Xb964Sg7otsGWB4An68HDw8N7CW8tvU7GAvYGg2iz8PDw8F7CW2vST4JKW6oovsXDw8M7wGsf2r6gLrYulW7rMi4eHh7emDdZUN7KShppozr01Ubg4eHhbeUlY0xr5YYEOdnQKK3Hw8PDO8Brj+y2sJs0xvLRqyStv4x7eHh4eFt5a4l1W0jNhwnazY2KGnh4eHhbebuaWG15t02720EHPDw8vNO8fOCpBdzj95Y/nvxiwMPDwxvzNhy7MTsvTLTbEUU8PDw8vE28/Gpfs1ZybZ/Zji/g4eHh7eLNW1PtAEGd9cebErW+8PDw8DbxJkMDa6XbtaGEUa0FDw8P7028PF1un7MWeJ48Bw8PD++tvMl4wXwm6nhKjYeHh3egGDEpvyb/lVed883Fw8PDO8FrG2DRcVymwntba3h4eHjHeF87kdpPQAVe+QAAAABJRU5ErkJggg==">分享</a><div class="tags"><a href="/tags/编程/">编程</a></div><div class="post-nav"><a class="next" href="/2019/10/28/树的相关知识点/">树的相关知识点（一）</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/10/28/《程序员修炼之道》读书笔记/">《程序员修炼之道》读书笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/28/树的相关知识点/">树的相关知识点（一）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/24/LeetCode-子数组题型总结/">LeetCode|子数组题型总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/29/《大型网站技术架构：核心原理与案例分析》读书笔记/">《大型网站技术架构：核心原理与案例分析》读书笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/19/MySQL通过ibd和frm文件恢复数据/">MySQL通过ibd和frm文件恢复数据</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/16/《人月神话》读书笔记/">《人月神话》读书笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/09/Java中的参数传递机制/">Java中的参数传递机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/02/Java中将List转为Map/">Java中将List转为Map</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/一次责任链模式的使用/">一次责任链模式的使用</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/22/JavaDaily/">JavaDaily</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
