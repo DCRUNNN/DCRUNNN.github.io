@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式文件系统HDFS | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式文件系统HDFS</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式文件系统HDFS</h1><div class="post-meta">Nov 25, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一、-HDFS简介"><span class="toc-text">一、 HDFS简介</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#概念"><span class="toc-text">概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设计目标"><span class="toc-text">设计目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优点"><span class="toc-text">优点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缺点"><span class="toc-text">缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#二、-HDFS原理"><span class="toc-text">二、 HDFS原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#系统架构"><span class="toc-text">系统架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#存储机制"><span class="toc-text">存储机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）数据文件存储"><span class="toc-text">1）数据文件存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）元数据存储"><span class="toc-text">2）元数据存储</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Hadoop1-x"><span class="toc-text">Hadoop1.x</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Hadoop2-x"><span class="toc-text">Hadoop2.x</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#读操作-从HDFS中读取内容"><span class="toc-text">读操作 从HDFS中读取内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#写操作-向HDFS中写入内容"><span class="toc-text">写操作 向HDFS中写入内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安全模式"><span class="toc-text">安全模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HDFS高可用"><span class="toc-text">HDFS高可用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#HDFS-文件管理"><span class="toc-text">HDFS 文件管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell命令"><span class="toc-text">Shell命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Rest-API"><span class="toc-text">Rest API</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#HDFS-系统管理"><span class="toc-text">HDFS 系统管理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考资料"><span class="toc-text">参考资料</span></a></li></ol></div></div><div class="post-content"><h1 id="一、-HDFS简介"><a href="#一、-HDFS简介" class="headerlink" title="一、 HDFS简介"></a>一、 HDFS简介</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
+<li>HDFS即Hadoop分布式文件系统（Hadoop Distributed File System）</li>
+<li>2003年10月Google发表了GFS（Google File System）论文</li>
+<li>HDFS是GFS的开源实现</li>
+<li>HDFS是Apache Hadoop的核心子项目</li>
+<li>HDFS是分布式计算中数据存储管理的基础，是基于流数据模式访问和处理超大文件的需求而开发的，可以运行于廉价的商用服务器上</li>
+<li>在开源大数据技术体系中，地位无可替代</li>
+</ul>
+<h2 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h2><ul>
+<li>运行在大量廉价商用机器上：硬件错误是常态，提供容错机制 </li>
+<li>简单一致性模型：一次写入多次读取，支持追加，不允许修改，保证数据一致性 </li>
+<li>流式数据访问：批量读而非随机读，关注吞吐量而非时间 </li>
+<li>存储大规模数据集：典型文件大小GB - TB，关注横向线性扩展</li>
+</ul>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ol>
+<li>高容错、高可用、高扩展 </li>
+</ol>
+<ul>
+<li>采用数据冗余，多Block多副本，副本丢失后自动恢复 </li>
+<li>引入NameNode High Availability(HA)解决方案，引入安全模式 </li>
+<li>10K节点规模 </li>
+</ul>
+<ol start="2">
+<li>支持海量数据存储</li>
+</ol>
+<ul>
+<li>典型文件大小GB - TB，百万以上文件数量，PB以上数据规模</li>
+</ul>
+<ol start="3">
+<li>构建成本低，安全可靠</li>
+</ol>
+<ul>
+<li>构建在廉价的商用服务器上</li>
+<li>提供了容错和恢复机制</li>
+</ul>
+<ol start="4">
+<li>适合大规模离线批处理</li>
+</ol>
+<ul>
+<li>流式数据访问机制</li>
+<li>数据位置暴露给计算框架</li>
+</ul>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ol>
+<li><p>不适合低延迟数据访问</p>
+</li>
+<li><p>不适合大量小文件存储</p>
+</li>
+</ol>
+<ul>
+<li>因为元数据占用NameNode大量内存空间，每个文件、目录和Block的元数据都要占用150Byte，若存储1亿个元素，大约需要20GB内存，如果一个文件为10KB，1亿个文件大小仅有1TB，却要消耗掉20GB内存</li>
+</ul>
+<ol start="3">
+<li>不支持并发写入  </li>
+</ol>
+<ul>
+<li>一个文件同时只能有一个写入者</li>
+</ul>
+<ol start="4">
+<li>不支持文件随机修改，仅支持追加写入</li>
+</ol>
+<h1 id="二、-HDFS原理"><a href="#二、-HDFS原理" class="headerlink" title="二、 HDFS原理"></a>二、 HDFS原理</h1><h2 id="系统架构"><a href="#系统架构" class="headerlink" title="系统架构"></a>系统架构</h2><p>HDFS由四部分组成：HDFS Client、DataNode、Active NameNode（AM）和Standby NameNode（SN）。<br>HDFS是一个主/从（Mater/Slave）体系结构，HDFS集群拥有一个NameNode和一些DataNode。NameNode管理文件系统的元数据，DataNode存储实际的数据。<br><img src="/images/big_data/HDFS/structure.jpg" alt="">  </p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p><strong>Active NameNode(AN)</strong></p>
+<ul>
+<li>活动Master管理节点（集群中唯一)</li>
+<li>管理文件系统的命名空间（NameSpace）</li>
+<li>管理元数据：文件的位置、所有者、权限、数据块等 </li>
+<li>管理配置Block副本策略：默认3个副本</li>
+<li>处理客户端读写请求，为DataNode分配任务 </li>
+<li>HDFS的守护进程 </li>
+</ul>
+<p><strong>Standby NameNode(SN)</strong></p>
+<ul>
+<li>热备Master管理节点（Active NameNode的热备节点）<ul>
+<li>在Hadoop 3.0中允许配置多个Standby NameNode</li>
+</ul>
+</li>
+<li>Active NameNode宕机后，快速升级为新的Active </li>
+<li>定期同步元数据，即周期性下载edits编辑日志，生成fsimage镜像检查点文件，合并fsimage和editslog，推送给NameNode</li>
+</ul>
+<p><strong>NameNode元数据文件</strong></p>
+<ul>
+<li>edits（编辑日志文件）：保存了自最新检查点（Checkpoint）之后的所有文件更新操作</li>
+<li>fsimage（元数据检查点镜像文件）：保存了文件系统中所有的目录和文件信息，如：某个目录下有哪些子目录和文件，以及文件名、文件副本数、文件由哪些Block组成等 </li>
+<li>Active NameNode内存中有一份最新的元数据（= fsimage + edits）</li>
+<li>Standby NameNode在检查点定期将内存中的元数据保存到fsimage文件中</li>
+</ul>
+<p><strong>DataNode</strong></p>
+<ul>
+<li>Slave工作节点，可大规模扩展</li>
+<li>存储实际的数据Block和数据校验和</li>
+<li>执行客户端发送的读写操作</li>
+<li>通过心跳机制定期（默认3秒）向NameNode汇报运行状态和Block列表信息</li>
+<li>集群启动时，DataNode向NameNode提供Block列表信息</li>
+</ul>
+<p><strong>Block数据块</strong></p>
+<ul>
+<li>HDFS最小存储单元</li>
+<li>文件写入HDFS会被切分成若干个Block，分散存储在集群的不同的数据节点DataNode上，需要注意的是，这个操作是HDFS自动完成的</li>
+<li>Block大小固定，默认128MB，可自定义</li>
+<li>若一个Block的大小小于设定值，不会占用整个块空间</li>
+<li>默认情况下每个Block有3个副本</li>
+</ul>
+<p><strong>Client</strong></p>
+<ul>
+<li>将文件切分为Block</li>
+<li>与NameNode交互，获取文件访问计划和相关元数据</li>
+<li>与DataNode交互，读取或写入文件</li>
+<li>管理HDFS</li>
+</ul>
+<h2 id="存储机制"><a href="#存储机制" class="headerlink" title="存储机制"></a>存储机制</h2><h3 id="1）数据文件存储"><a href="#1）数据文件存储" class="headerlink" title="1）数据文件存储"></a>1）数据文件存储</h3><p><strong>Block存储：</strong></p>
+<ul>
+<li>Block是HDFS的最小存储单元</li>
+<li>如何设置Block大小呢？目标是最小化寻址开销（降到1%以下），默认大小是128MB，块若设置得太小，则寻址时间占比过高；若块设置得太大，则Map任务数太少，并发度降低，作业执行速度变慢。</li>
+<li>Block和元数据分开存储，Block存储于DataNode，元数据存储于NameNode </li>
+<li>Block多副本，以DataNode节点为备份对象<ol>
+<li>机架感知：将副本存储到不同的机架上，实现数据的高容错</li>
+<li>副本均匀分布：提高访问带宽和读取性能，实现负载均衡</li>
+</ol>
+</li>
+</ul>
+<p><strong>Block副本放置策略</strong></p>
+<ul>
+<li>副本1：放在Client所在节点。对于远程Client，系统会随机选择节点</li>
+<li>副本2：放在不同的机架节点上</li>
+<li>副本3：放在与第二个副本同一机架的不同节点上</li>
+<li>副本N：随机选择</li>
+<li>节点选择：同等条件下优先选择空闲节点</li>
+</ul>
+<p><strong>Block文件</strong></p>
+<ul>
+<li>Block文件是DataNode本地磁盘中名为“blk_blockId”的Linux文件</li>
+<li>Block元数据文件（* .meta）由一个包含版本、类型信息的头文件和一系列校验值组成</li>
+</ul>
+<h3 id="2）元数据存储"><a href="#2）元数据存储" class="headerlink" title="2）元数据存储"></a>2）元数据存储</h3><p><strong>元数据存储的两者形式</strong></p>
+<ul>
+<li>内存元数据（NameNode）</li>
+<li>文件元数据（edits+fsimage）</li>
+</ul>
+<p><strong>edits（编辑日志文件）</strong></p>
+<ul>
+<li>Client请求变更操作时，操作首先被写入edits，再写入内存</li>
+<li>edits文件名通过前/后缀记录当前操作的Transaction Id</li>
+</ul>
+<p><strong>fsimage（元数据镜像检查点文件）</strong></p>
+<ul>
+<li>不会为文件系统的每个更新操作进行持久化，因为写fsimage的速度非常慢</li>
+<li>fsimage文件名会标记对应的Transaction Id</li>
+</ul>
+<p><strong>edits和fsimage的合并机制</strong></p>
+<h4 id="Hadoop1-x"><a href="#Hadoop1-x" class="headerlink" title="Hadoop1.x"></a>Hadoop1.x</h4><ul>
+<li>在NameNode运行期间，HDFS的所有更新操作都是直接写入edits文件中，因此edits文件将变得很大，虽然这对NameNode运行时影响不大，但是在NameNode重启时，NameNode会先将fsimage里的所有内容映射到内存中，然后再一条一条地执行edits中的操作记录，当edits文件非常大时，会导致NameNode启动操作非常慢，并且这段时间HDFS系统处于安全模式，无法满足用户要求。</li>
+<li>在Hadoop1.x版本中有个Secondary NameNode进程，它不完全是Primary NameNode的热备进程，它是HDFS架构的一个组成部分，用来保存NameNode中元数据metadata的备份，一般是将其单独运行在一台机器上的。<ol>
+<li>Secondary NameNode会定期和Primary NameNode通信，请求其停止使用edits文件，暂时将新的写操作写到一个新的edits.new文件中，这个操作是瞬间完成的，上层写日志的函数完全感觉不到这个差别</li>
+<li>Secondary NameNode通过HTTP GET方式从Primary NameNode中获取fsimage和edits文件，并将其下载到本地的相应目录下</li>
+<li>Secondary NameNode将下载完成的fsimage载入到内存中，然后逐条执行edits文件中的各项更新操作，使得内存中的fsimage文件保持最新，这个过程就是edits和fsimage文件的合并</li>
+<li>Secondary NameNode执行完第三步的操作后，通过POST方式将新的fsimage.ckpt文件发送到Primary NameNode节点上</li>
+<li>Primary NameNode用从Secondary NameNode接收到的新的fsimage文件替换旧的fsimage文件，同时用edits.new文件替换edits文件，通过这个过程就减小了edits文件大小，加快了NameNode的重启速度</li>
+</ol>
+</li>
+<li>从上面的描述可以发现，Secondary NameNode并不是Primary NameNode的一个热备，它主要负责将fsimage和edits文件合并。其拥有的fsimage文件并不是最新的，因为当它从Primary NameNode中下载fsimage和edits文件时，新的更新操作已经写入edits.new文件中了，这些更新在Secondary NameNode中并没有同步到。</li>
+<li>如果Primary NameNode中的fsimage真的出问题了，还是可以用Secondary NameNode中的fsimage替换一下的，虽然不是最新的fsimage，但是可以将损失降至最低。</li>
+</ul>
+<h4 id="Hadoop2-x"><a href="#Hadoop2-x" class="headerlink" title="Hadoop2.x"></a>Hadoop2.x</h4><ul>
+<li>在Hadoop2.x中解决了Primary NameNode的单点故障问题，并且弃用了Secondary NameNode。</li>
+<li>在Hadoop2.x中提供了HA机制（解决NameNode单点故障，提供高可用机制），通过配置奇数个JournalNode来实现HA。</li>
+<li>HA机制通过在同一个集群中运行两个NameNode（Active NameNode、Standby NameNode），来解决NameNode单点故障问题。在任何时间，只有一台机器处于Active状态，另一台机器处于standby状态。Active NN负责接收集群中所有客户端的操作，Standby NN主要用于备用，需要保证StandbyNN中的状态和Active NN的状态尽可能同步，从而可以快速提供故障恢复。</li>
+<li>为了保证StandbyNN中的状态和Active NN的状态尽可能同步，即元数据保持一致，它们都会与Journal Nodes守护进程通信。当Active NN执行任何有关文件系统NameSpace的修改操作时，它需要持久化到一半以上（<strong>大多数</strong>）的Journal Nodes上（通过edits持久化存储），而Standby NN负责观察edits文件的变化，它能够从Journal Node集群中读取edits信息，并更新其内部的NameSpace。一旦Active NN出现了故障，Standby NN会保证从Journal Nodes集群中读取出了全部的edits文件，然后切换成Active状态，从而保证Standby NN和Actvie NN拥有完全同步的NameSpace状态。</li>
+<li>实现fsimage和edits文件合并的机制<ul>
+<li>在Standy NameNode节点上会一直运行一个叫做CheckpointerThread的线程，这个线程调用StandbyCheckpointer类的doWork()函数，该函数会每隔Math.min(checkpointCheckPeriod, checkpointPeriod)秒来执行一次合并操作。这两个时间可以通过配置文件进行配置</li>
+</ul>
+</li>
+<li>具体步骤：<ol>
+<li>Active NN提交edits log到JournalNode集群中<br>Active NN同时向本地磁盘目录和JournalNode集群上的共享目录中写入edits log，这里是同步地向本地和JN集群中写入edits日志，向JN集群中写edits时是并行写的。只要向大多数的JN写入edits文件成功，就认为此次提交edits文件成功，否则认为提交失败，导致Active NN退出进程，Standby NN接管之后进行数据恢复</li>
+<li>Standby NN从Journal Node集群中同步edits文件<br>Standby NN定期从Journal Node集群中下载edits文件放到节点的内存中，然后Standby NameNode中的StandbyCheckpointer类会定期检查合并的条件是否成立，如果成立则会合并fsimage和edits文件（checkpoint机制）。Standby NameNode中的StandbyCheckpointer类合并完之后，将合并之后的fsimage上传到Active NameNode相应目录中。Active NameNode接到最新的fsimage文件之后，将旧的fsimage和edits文件清理掉；</li>
+</ol>
+</li>
+</ul>
+<p><strong>参考阅读</strong><br>[1]<a href="https://bobokele.blog.csdn.net/article/details/51686257" target="_blank" rel="noopener">Hadoop-2.X HA模式下的FSImage和EditsLog合并过程</a><br>[2]<a href="https://mp.weixin.qq.com/s/pVYqV8zPa6WnZv0xs5XIpg" target="_blank" rel="noopener">HDFS fsimage和edits合并实现原理</a></p>
+<h2 id="读操作-从HDFS中读取内容"><a href="#读操作-从HDFS中读取内容" class="headerlink" title="读操作 从HDFS中读取内容"></a>读操作 从HDFS中读取内容</h2><p>综述：客户端将要读取的文件路径发送给NameNode，NameNode获取文件的元信息（主要是Block的存放位置信息）返回给客户端，客户端根据返回的信息找到相应DataNode逐个获取文件的block并在客户端本地进行数据追加合并从而获得整个文件</p>
+<p>具体：</p>
+<ol>
+<li>客户端跟NameNode通信，发送文件路径，请求读取文件</li>
+<li>NameNode检查文件目录树，查询文件块组成，查询文件块与DataNode的映射关系。【获取文件的元数据信息（Block所在的DataNode节点信息）】</li>
+<li>按照DataNode与客户端的距离由近到远的顺序列表返回给客户端。</li>
+<li>客户端与最近的DataNode建立连接，请求建立Socket流</li>
+<li>DataNode将文件Block数据返回给客户端</li>
+<li>客户端在本地将组成文件的Block拼接成一个文件</li>
+</ol>
+<h2 id="写操作-向HDFS中写入内容"><a href="#写操作-向HDFS中写入内容" class="headerlink" title="写操作 向HDFS中写入内容"></a>写操作 向HDFS中写入内容</h2><ol>
+<li>客户端向NameNode请求上传文件，请求NameNode在NameSpace中建立新的文件元信息</li>
+<li>NameNode检查目录，检查目标文件是否已存在，父目录是否存在，是否具有权限，是否有足够资源等</li>
+<li>NameNode返回是否允许上传，若通过检查，直接先将操作写入EditLog，并返回输出流对象。 （WAL，write ahead log，先写Log，再写内存，因为EditLog记录的是最新的HDFS客户端执行所有的写操作）</li>
+<li>客户端将文件切分为Block（默认128MB一个块）</li>
+<li>客户端请求第一个Block该传输到哪些DataNode服务器上</li>
+<li>NameNode从DataNode信息池中检查DataNode信息</li>
+<li>NameNode返回分配的可写的DataNode列表</li>
+<li>客户端请求建立Block传输管道，请求一台DataNode上传数据（本质上是一个RPC调用，建立pipeline），第一个DataNode收到请求会继续调用第二个DataNode，然后第二个调用第三个DataNode，将整个pipeline建立完成，逐级返回客户端</li>
+<li>客户端以packet为单位发送第一个Block的数据，在写入的时候DataNode会进行数据校验，它并不是通过一个packet（64kb）进行一次校验而是以chunk为单位进行校验（512byte），第一台DataNode收到一个packet就会传给第二台，第二台传给第三台；第一台每传一个packet会放入一个应答队列等待应答。最后返回写入成功。</li>
+<li>当一个Block传输完成之后，客户端再次请求NameNode上传第二个Block的服务器</li>
+</ol>
+<p><strong>相关链接</strong><br>[1]<a href="https://blog.csdn.net/qq_20641565/article/details/53328279" target="_blank" rel="noopener">HDFS读写文件流程</a><br>[2]<a href="https://www.cnblogs.com/dummyly/p/10080286.html" target="_blank" rel="noopener">HDFS写数据和读数据流程</a><br>[3]<a href="https://cloud.tencent.com/developer/article/1488464" target="_blank" rel="noopener">HDFS 读写流程与数据完整性</a></p>
+<h2 id="安全模式"><a href="#安全模式" class="headerlink" title="安全模式"></a>安全模式</h2><p><strong>什么是安全模式</strong></p>
+<ul>
+<li>安全模式是HDFS的一种特殊状态，在这种状态下，HDFS只接收读数据请求，而不接收写入、删除、修改等变更请求</li>
+<li>安全模式是HDFS确保Block数据安全的一种保护机制</li>
+<li>Active NameNode启动时，HDFS会进入安全模式，DataNode主动向NameNode汇报可用Block列表等信息，在系统达到安全标准前，HDFS一直处于“只读”状态 </li>
+</ul>
+<p><strong>何时正常离开安全模式</strong></p>
+<ul>
+<li>Block上报率：DataNode上报的可用Block个数 / NameNode元数据记录的Block个数</li>
+<li>当Block上报率 &gt;= 阈值时，HDFS才能离开安全模式，默认阈值为0.999</li>
+<li>不建议手动强制退出安全模式</li>
+</ul>
+<p><strong>触发安全模式的原因</strong></p>
+<ul>
+<li>NameNode重启</li>
+<li>NameNode磁盘空间不足</li>
+<li>Block上报率低于阈值</li>
+<li>DataNode无法正常启动</li>
+<li>日志中出现严重异常</li>
+<li>用户操作不当，如：强制关机（特别注意！） </li>
+</ul>
+<h2 id="HDFS高可用"><a href="#HDFS高可用" class="headerlink" title="HDFS高可用"></a>HDFS高可用</h2><ol>
+<li>Active NN与Standby NN的主备切换 </li>
+<li>利用QJM实现元数据高可用 </li>
+</ol>
+<ul>
+<li>QJM机制（Quorum Journal Manager）：只要保证Quorum（法定人数）数量的操作成功，就认为这是一次最终成功的操作（大多数）</li>
+<li>QJM共享存储系统：部署奇数（2N+1）个JournalNode，JournalNode负责存储edits编辑日志，写edits的时候，只要超过半数（≥N+1）的JournalNode返回成功，就代表本次写入成功，因此最多可容忍N个JournalNode宕机，这是基于Paxos算法的实现。 </li>
+</ul>
+<ol start="3">
+<li>利用ZooKeeper实现Active节点选举<br><img src="/images/big_data/HDFS/HA.jpg" alt="">  </li>
+</ol>
+<p><strong>参考阅读</strong><br>[1]<a href="https://www.jianshu.com/p/8a6cc2d72062" target="_blank" rel="noopener">NameNode HA实现原理</a><br>[2]<a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-hadoop-name-node/" target="_blank" rel="noopener">Hadoop NameNode 高可用 (High Availability) 实现解析</a><br>[3]<a href="https://blog.csdn.net/bingduanlbd/article/details/51946540" target="_blank" rel="noopener">Hadoop HDFS高可用（HA）</a><br>[4]<a href="https://blog.csdn.net/qq_31598113/article/details/69220262" target="_blank" rel="noopener">HDFS的运行原理,如何实现HDFS的高可用</a></p>
+<h1 id="HDFS-文件管理"><a href="#HDFS-文件管理" class="headerlink" title="HDFS 文件管理"></a>HDFS 文件管理</h1><h2 id="Shell命令"><a href="#Shell命令" class="headerlink" title="Shell命令"></a>Shell命令</h2><p><strong>语法</strong></p>
+<ul>
+<li>hadoop fs <args> （使用面最广，可以操作任何文件系统）</args></li>
+<li>hdfs dfs  <args>（只能操作HDFS文件系统）</args></li>
+<li>大部分用法和Linux Shell类似，可通过help查看帮助 </li>
+</ul>
+<p>如：</p>
+<ol>
+<li>hadoop fs -ls [-d] [-h] [-R] <args></args></li>
+<li>hadoop fs -get [-ignorecrc] [-crc] <src> <localdst>: 拷贝文件到本地文件系统</localdst></src></li>
+<li>hadoop fs -put <localsrc> … <dst>： 从本地文件系统上传文件到模板文件系统</dst></localsrc></li>
+<li>hadoop fs -cp [-f] [-p | -p[topax]] URI [URI …] <dest></dest></li>
+<li>hadoop fs -mv URI [URI …] <dest></dest></li>
+<li>hadoop fs -rm [-f] [-r |-R] [-skipTrash] URI [URI …]</li>
+</ol>
+<p><strong>HDFS URI</strong></p>
+<ul>
+<li>格式：scheme://authority/path</li>
+<li>示例：HDFS上的一个文件/parent/child</li>
+</ul>
+<h2 id="Rest-API"><a href="#Rest-API" class="headerlink" title="Rest API"></a>Rest API</h2><ul>
+<li>HDFS的所有接口都支持REST API</li>
+<li>HDFS URI与HTTP URL<ul>
+<li>hdfs://<host>:&lt;RPC_PORT&gt;/<path></path></host></li>
+<li>http://<host>:&lt;HTTP_PORT&gt;/webhdfs/v1/<path></path>?op=…</host></li>
+</ul>
+</li>
+</ul>
+<h1 id="HDFS-系统管理"><a href="#HDFS-系统管理" class="headerlink" title="HDFS 系统管理"></a>HDFS 系统管理</h1><p><strong>系统监控</strong></p>
+<ul>
+<li>Active NameNode WebUI<ul>
+<li><a href="http://activeNameNodeHost:50070" target="_blank" rel="noopener">http://activeNameNodeHost:50070</a> </li>
+<li>端口是50070</li>
+</ul>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1]<a href="https://juejin.im/post/5d885bbcf265da039e12fa13" target="_blank" rel="noopener">带你入坑大数据（一） — HDFS基础概念篇</a><br>[2]<a href="https://www.ibm.com/developerworks/cn/web/wa-introhdfs/" target="_blank" rel="noopener">Hadoop Distributed File System 简介</a><br>[3]<a href="https://www.cnblogs.com/caiyisen/p/7395843.html" target="_blank" rel="noopener">HDFS知识点总结</a><br>[4]<a href="https://www.jianshu.com/p/f1e785fffd4d" target="_blank" rel="noopener">HDFS</a></p>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/11/25/大数据理论篇-分布式文件系统HDFS/" data-id="ck3eipgcz002e4kubdmprcmh1" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuElEQVR42u3aQW7jQAwEQP3/0wmQUw6R0iSHsQOUTgutZU15gRluk9cVXx9f11W8vj/1EVzJs9fGhYeHh9daxPMrn1//fD+/c/fGu79NfiY8PDy8PV6+rT+/4O7Z5KkqODrA8PDw8F7KS5Y7qXKTT+Lh4eH9L16+iLNLx8PDw3tPXlIiP9/vBb7Vcnwxa8HDw8Or7dLlVtZr/7zY38PDw8MbdNWrrf28+O4NKJRXi4eHh7fA640FPIcF1WGp3lBCoZTHw8PDO8qrhgvVOCD/OapriAbC8PDw8P6El2zZvWGpeYurHDTj4eHhrfF6ZWs1qpgU3FUYHh4e3jav12TKqWefKqwTDw8Pb4GXHwaTDTqPZScTELffgIeHh3eUdypumN/vDSgU/t3w8PDwDvF623QvYK1+Mh/nio4iPDw8vKO8aiTRK7i3m2q39/Hw8PCO8vJNPGlNTcKL/CfIo148PDy8DV514KkXTORnVK80P9Dlw8PDw4t5vSC1Gtfmb0/u54cWHh4e3gav1yeqlsjVsrhaOidxBh4eHt4pXh4Z9Lb1SbhQxfxwHw8PD2+NN19WtXmWF8p5EHx7MODh4eEt8E593STMzWOIQqyMh4eHt8xLtuxTgex8+CBaJx4eHt4yb/6f/0KxOyjZC6U8Hh4e3hpvY7m92KJXlN9+Mx4eHt4Cr1rCVgcF8qGE3hujowUPDw/vKK+60c8HWHslez78+ss0Lh4eHt4CL9mgq0MDk2/utcdGJx4eHh7e792rq7rt5sFrXhD3Pp+HIHh4eHhneb32fC+i7TW3Jq04PDw8vD1eUi7PS+1qYDEKI/Dw8PDegDcfNp1EGHmD7aqePHh4eHjLvLyt9byJ57FsXuKPSmo8PDy8hTAi39DzwjcPgns/Fh4eHt4Gr9cAy19cDThyTHU9eHh4eGPeJ15cxpsU6pAsAAAAAElFTkSuQmCC">分享</a><div class="tags"><a href="/tags/大数据/">大数据</a><a href="/tags/分布式文件系统/">分布式文件系统</a></div><div class="post-nav"><a class="next" href="/2019/11/25/设计模式理论篇-状态模式/">设计模式理论篇 | 状态模式</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/大数据理论篇-分布式文件系统HDFS/">大数据理论篇 | 分布式文件系统HDFS</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-状态模式/">设计模式理论篇 | 状态模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-策略模式/">设计模式理论篇 | 策略模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-代理模式/">设计模式理论篇 | 代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-外观模式/">设计模式理论篇 | 外观模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-观察者模式/">设计模式理论篇 | 观察者模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-命令模式/">设计模式理论篇 | 命令模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/23/设计模式理论篇-适配器模式/">设计模式理论篇 | 适配器模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/23/设计模式理论篇-组合模式/">设计模式理论篇 | 组合模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/23/Java对Map进行排序/">Java对HashMap进行排序</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
