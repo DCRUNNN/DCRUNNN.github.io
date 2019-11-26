@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式资源管理框架YARN | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式资源管理框架YARN</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式资源管理框架YARN</h1><div class="post-meta">Nov 26, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一、-产生背景"><span class="toc-text">一、 产生背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#二、-YARN设计目标"><span class="toc-text">二、 YARN设计目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#三、-YARN架构"><span class="toc-text">三、 YARN架构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-系统架构"><span class="toc-text">3.1 系统架构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-1-基本思想"><span class="toc-text">3.1.1 基本思想</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-2-核心概念"><span class="toc-text">3.1.2 核心概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-3-工作机制"><span class="toc-text">3.1.3 工作机制</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-高可用"><span class="toc-text">3.2 高可用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#四、-YARN资源调度策略"><span class="toc-text">四、 YARN资源调度策略</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-FIFO调度器"><span class="toc-text">4.1 FIFO调度器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-容量调度器"><span class="toc-text">4.2 容量调度器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-公平调度器"><span class="toc-text">4.3 公平调度器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#五、-YARN运维与监控"><span class="toc-text">五、 YARN运维与监控</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-YARN运维"><span class="toc-text">5.1 YARN运维</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-YARN监控"><span class="toc-text">5.2 YARN监控</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考资料"><span class="toc-text">参考资料</span></a></li></ol></div></div><div class="post-content"><h1 id="一、-产生背景"><a href="#一、-产生背景" class="headerlink" title="一、 产生背景"></a>一、 产生背景</h1><p>Hadoop 1.X时期，MapReduce采用的也是主从架构：即master-slaves架构，一个JobTracker带多个TaskTracker。JobTracker：负责资源管理和作业调度；Tasktracker 向jobtracker定期汇报本节点的健康状况、资源使用情况、作业执行情况；同时也接收来自JobTracker的命令，负责启动和杀死任务的具体执行。MapReduce作业拆分成Map任务和Task任务，由TaskTracker负责执行和汇报。<br>这样的架构存在天生的缺陷：</p>
+<ol>
+<li>MapReduce同时身兼两职：既是计算框架，同时又是资源管理系统。</li>
+<li>其主要角色JobTracker既做资源管理，又做任务调度，任务太重，开销过大，同时存在单点故障。<ul>
+<li>JobTracker既要维护job的状态又要维护job的task的状态，造成资源消耗过多</li>
+</ul>
+</li>
+<li>不仅如此，早期的MR的资源描述模型过于简单，导致资源利用率较低<ul>
+<li>它仅把Task数量看作资源，没有考虑CPU和内存</li>
+<li>强制把资源分成Map Task Slot和Reduce Task Slot，仅仅只能支持MR作业，不能支持其他计算框架（如Spark、Storm等）</li>
+</ul>
+</li>
+<li>MR还存在扩展性较差（集群规模上限4K）</li>
+<li>源码难以理解，升级维护困难</li>
+<li>难以统一管理多个集群（如Spark集群，hadoop集群同时存在），资源利用率较低，彼此之间没有办法共享资源，运维成本高。</li>
+</ol>
+<p>于是Hadoop在1.0升级到2.0的过程中，便将JobTracker的资源调度工作独立了出来，这个独立出来的资源管理框架，就是Yarn。</p>
+<h1 id="二、-YARN设计目标"><a href="#二、-YARN设计目标" class="headerlink" title="二、 YARN设计目标"></a>二、 YARN设计目标</h1><ul>
+<li>YARN，Yet Another Resource Negotiator，另一种资源管理器</li>
+<li>定位是 分布式通用资源管理系统</li>
+<li>设计目标：聚焦资源管理、通用（适用各种计算框架）、高可用、高扩展</li>
+<li>YARN在大数据生态中的位置，位于HDFS之上，多种计算框架、数据分析框架等应用程序之下，这样多种不同类型的计算框架都可以运行在同一个集群里面，共享同一个HDFS集群上的数据，享受整体的资源调度。也就是 XXX on YARN，例如Spark on YARN，Spark on YARN，MapReduce on Yarn，Storm on YARN，Flink on YARN。好处是与其他计算框架共享集群资源，按自愿需要分配，进而提高集群资源的利用率。</li>
+</ul>
+<h1 id="三、-YARN架构"><a href="#三、-YARN架构" class="headerlink" title="三、 YARN架构"></a>三、 YARN架构</h1><h2 id="3-1-系统架构"><a href="#3-1-系统架构" class="headerlink" title="3.1 系统架构"></a>3.1 系统架构</h2><h3 id="3-1-1-基本思想"><a href="#3-1-1-基本思想" class="headerlink" title="3.1.1 基本思想"></a>3.1.1 基本思想</h3><ul>
+<li>Master/Slave架构</li>
+<li>将JobTracker的资源管理、任务调度功能分离 </li>
+<li>三种角色：ResourceManager（Master）、NodeManager（Slave）、ApplicationMaster （新角色）<br><img src="/images/big_data/YARN/structure.jpg" alt="">  </li>
+</ul>
+<h3 id="3-1-2-核心概念"><a href="#3-1-2-核心概念" class="headerlink" title="3.1.2 核心概念"></a>3.1.2 核心概念</h3><p>1）<strong>ResourceManager（RM）</strong></p>
+<ol>
+<li>主要功能：</li>
+</ol>
+<ul>
+<li>统一管理集群的所有资源 </li>
+<li>将资源按照一定策略分配给各个应用（ApplicationMaster）</li>
+<li>接收NodeManager的资源上报信息</li>
+</ul>
+<ol start="2">
+<li>核心组件</li>
+</ol>
+<ul>
+<li>用户交互服务（User Service）</li>
+<li>NodeManager管理</li>
+<li>ApplicationMaster管理</li>
+<li>Application管理</li>
+<li>定时调用器(Scheduler)</li>
+<li>安全管理</li>
+<li>资源管理</li>
+</ul>
+<p>2）<strong>NodeManager（NM）</strong></p>
+<ol>
+<li>主要功能</li>
+</ol>
+<ul>
+<li>管理单个节点的资源</li>
+<li>向ResourceManager汇报节点资源使用情况</li>
+<li>管理Container的生命周期</li>
+</ul>
+<ol start="2">
+<li>核心组件</li>
+</ol>
+<ul>
+<li>NodeStatusUpdater</li>
+<li>ContainerManager</li>
+<li>ContainerExecutor</li>
+<li>NodeHealthCheckerService</li>
+<li>Security</li>
+<li>WebServer</li>
+</ul>
+<p>3）<strong>ApplicationMaster（AM）</strong></p>
+<ol>
+<li>主要功能</li>
+</ol>
+<ul>
+<li>管理应用程序实例</li>
+<li>向ResourceManager申请任务执行所需的资源</li>
+<li>任务调度和监管</li>
+</ul>
+<ol start="2">
+<li>实现方式</li>
+</ol>
+<ul>
+<li>需要为每个应用开发一个AM组件</li>
+<li>YARN提供MapReduce的ApplicationMaster实现</li>
+<li>采用基于事件驱动的异步编程模型，由中央事件调度器统一管理所有事件</li>
+<li>每种组件都是一种事件处理器，在中央事件调度器中注册</li>
+</ul>
+<p>4）Container</p>
+<ul>
+<li>概念：Container封装了节点上进程的相关资源，是YARN中资源的抽象</li>
+<li>分类：运行ApplicationMaster的Container、运行应用任务的Container</li>
+<li>Yarn 将CPU核数，内存这些计算资源都封装成为一个个的容器（Container）。需要注意两点：<ol>
+<li>容器Container由 NodeManager 启动和管理，并被它所监控。</li>
+<li>容器Container被 ResourceManager 进行调度</li>
+</ol>
+</li>
+</ul>
+<h3 id="3-1-3-工作机制"><a href="#3-1-3-工作机制" class="headerlink" title="3.1.3 工作机制"></a>3.1.3 工作机制</h3><p><img src="/images/big_data/YARN/work.jpg" alt="">  </p>
+<ol>
+<li>客户端提交Task请求到RM</li>
+<li>RM先到NM上启动1个Container，用来运行AM，并监控AM</li>
+<li>AM启动后，向RM注册(任务是由AM管理的，注册之后，用户就可以通过RM查询AM上的作业进度)并向NM申请资源(Core Memory)，申请资源，RM给AM分配响应的NM资源</li>
+<li>AM下发指令给相应的的NM，与NM协调分配Container，NM启动Container，启动并运行task</li>
+</ol>
+<h2 id="3-2-高可用"><a href="#3-2-高可用" class="headerlink" title="3.2 高可用"></a>3.2 高可用</h2><p><strong>ResourceManager高可用</strong></p>
+<ul>
+<li>一个Active RM，多个Standby RM</li>
+<li>Active RM宕机后自动实现主备切换</li>
+<li>Zookeeper的核心作用：<ol>
+<li>Active节点选举</li>
+<li>恢复Active RM的原有状态信息</li>
+</ol>
+</li>
+<li>重启AM，杀死所有运行中的Container</li>
+<li>切换方式：手动、自动</li>
+</ul>
+<h1 id="四、-YARN资源调度策略"><a href="#四、-YARN资源调度策略" class="headerlink" title="四、 YARN资源调度策略"></a>四、 YARN资源调度策略</h1><h2 id="4-1-FIFO调度器"><a href="#4-1-FIFO调度器" class="headerlink" title="4.1 FIFO调度器"></a>4.1 FIFO调度器</h2><p><strong>FIFO Scheduler（先进先出调度器）</strong><br><strong>调度策略</strong></p>
+<ul>
+<li>将所有任务放入一个队列，先进队列的先获得资源，排在后面的任务只有等待。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ol>
+<li>资源利用率差，无法交叉运行任务</li>
+<li>灵活性差，如：紧急任务无法插队，耗时长的任务拖慢耗时短的任务</li>
+</ol>
+<h2 id="4-2-容量调度器"><a href="#4-2-容量调度器" class="headerlink" title="4.2 容量调度器"></a>4.2 容量调度器</h2><p><strong>Capacity Scheduler（容量调度器）</strong><br><strong>核心思想</strong></p>
+<ul>
+<li>提前做预算，在预算指导下分享集群资源 </li>
+</ul>
+<p><strong>调度策略</strong></p>
+<ul>
+<li>集群资源由多个队列分享</li>
+<li>每个队列都要预设资源分配的比例（提前做预算）</li>
+<li>空闲资源优先分配给“实际资源/预算资源”比值最低的队列</li>
+<li>队列内部采用FIFO调度策略</li>
+</ul>
+<p><strong>特点</strong></p>
+<ul>
+<li>层次化的队列设计：子队列可使用父队列资源</li>
+<li>容量保证：每个队列都要预设资源占比，防止资源独占</li>
+<li>弹性分配：空闲资源可以分配给任何队列，当多个队列争用时，会按比例进行平衡</li>
+<li>支持动态管理：可以动态调整队列的容量、权限等参数，也可动态增加、暂停队列</li>
+<li>访问控制：用户只能向自己的队列中提交任务，不能访问其他队列</li>
+<li>多租户：多用户共享集群资源</li>
+</ul>
+<h2 id="4-3-公平调度器"><a href="#4-3-公平调度器" class="headerlink" title="4.3 公平调度器"></a>4.3 公平调度器</h2><p><strong>Fair Scheduler（公平调度器）</strong><br><strong>调度策略</strong></p>
+<ul>
+<li>多队列公平共享集群资源 </li>
+<li>通过平分的方式，动态分配资源，无需预先设定资源分配比例</li>
+<li>队列内部可配置调度策略：FIFO、Fair（默认）</li>
+</ul>
+<p><strong>资源抢占</strong></p>
+<ul>
+<li>终止其他队列的任务，使其让出所占资源，然后将资源分配给占用资源量少于最小资源量限制的队列</li>
+</ul>
+<p><strong>队列权重</strong></p>
+<ul>
+<li>当队列中有任务等待，并且集群中有空闲资源时，每个队列可以根据权重获得不同比例的空闲资源</li>
+</ul>
+<h1 id="五、-YARN运维与监控"><a href="#五、-YARN运维与监控" class="headerlink" title="五、 YARN运维与监控"></a>五、 YARN运维与监控</h1><h2 id="5-1-YARN运维"><a href="#5-1-YARN运维" class="headerlink" title="5.1 YARN运维"></a>5.1 YARN运维</h2><p>Shell命令： yarn application [command_options]<br>command_options如-list、-kill、-status</p>
+<p><strong>Kill任务</strong></p>
+<ul>
+<li>CTRL+C不能终止任务，只是停止其在控制台的信息输出，任务仍在集群中运行</li>
+<li>正确方法：先使用yarn application -list获取进程号，再使用-kill终止任务</li>
+</ul>
+<h2 id="5-2-YARN监控"><a href="#5-2-YARN监控" class="headerlink" title="5.2 YARN监控"></a>5.2 YARN监控</h2><ul>
+<li>访问Resource Manager的8088端口，进入监控页面，</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1]<a href="https://www.itcodemonkey.com/article/12941.html" target="_blank" rel="noopener">让 Hadoop 称霸至今的框架 –Hadoop Yarn</a><br>[2]<a href="https://blog.csdn.net/wendingzhulu/article/details/78826132" target="_blank" rel="noopener">分布式资源管理器YARN简介（一）</a><br>[3]<a href="https://www.jianshu.com/p/9228767f13a3" target="_blank" rel="noopener">分布式资源管理系统：YARN</a><br>[4]<a href="https://zhuanlan.zhihu.com/p/28640358" target="_blank" rel="noopener">YARN 分布式资源调度</a></p>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/11/26/大数据理论篇-分布式资源管理框架YARN/" data-id="ck3fgqj8j002b5kubjayalgat" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADOklEQVR42u3aQY7bMAwF0Ln/pTNA0cVsbH+SChApT6sibWw9ZcHyUz8/8Xr9W1ef/11Xf3v/yf177598/4TRwsbGxt6E/bpdCeCK0UP2dptbsLGxsU9l32/iHRXy/rCScpUfKzY2Njb21Vby8lMteHmpw8bGxsausnvtRFJ+ks+xsbGxsSehUq/MzFuO6nEsztKwsbGxP569KgD6hD+/cb6NjY2N/ZHsV3Hlo9y8IemNcnv7//9dbGxs7IPYeXCfx0PvAE/KVaEDw8bGxt6QXS0M1YhnHjP1wqOH52NjY2Mfyq6ObHttySS4rx7Q5RFgY2NjH8eulo28IFVLXdLe9EomNjY29jew803MW5FJyVxwZNjY2NgHsXsBfV6ceqPivDTm44eHUo2NjY19BHvO6zUw1e9WA6+Hp2FjY2Nvzu4NAKqD4VWhUvKTRE/AxsbGPog9Qc4HANW4qhd4PXRd2NjY2Juz5zFNIa8Knp9HVNUrPtjY2NjfwE7+679quLv2Wk/158TGxsY+iT0qA0sjp5yUDxiqo2JsbGzsfdnVF+fXHHub68VG5bdgY2NjH8SePCjZ4juu+CQVuDAbwcbGxt6WXQ13qpds1oZKeTNTaEKwsbGxD2L3LtNUr9pMruBUw6/yHSVsbGzsbdnLAppixJ+PGaqtTtSKYGNjY38Be9IkTMKjPCoatSLY2NjYR7B713R6jUTvaKrNSfVd2NjY2Luz89goL2nVcCr5Har/5uESEjY2NvZB7F7Qkxe8vGHIN5oHXgsaEmxsbOyt2JPH9QpPtYEpjwGqQ19sbGzsDdm9E0oKQ154ejvJjynqwLCxsbGPYOdhfe/azWQkPD+ay/EANjY29ubseQyUb3dSGnupWOFb2NjY2NuyX8VVjaLy0UK1cOZH8zASwMbGxt6cna8kyq+WnFdrVQfS2NjY2N/Azi+75C1BUjyqRai6t4f9YGNjYx/H7sX9SYNRvj0U15pq6S3MsbGxsbEPZSftRL7RaplMmp9CUIWNjY39xexJxJM3Icl78x1ezkawsbGxD2LPg5vqGKA3WujFVYvHA9jY2Ngfxh5FM0EQv2pUkBfFZbNubGxs7E9n/wJGJKWBiX1T7wAAAABJRU5ErkJggg==">分享</a><div class="tags"></div><div class="post-nav"><a class="next" href="/2019/11/25/设计模式理论篇-享元模式/">设计模式理论篇 | 享元模式</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/大数据理论篇-分布式资源管理框架YARN/">大数据理论篇 | 分布式资源管理框架YARN</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-享元模式/">设计模式理论篇 | 享元模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/大数据理论篇-分布式文件系统HDFS/">大数据理论篇 | 分布式文件系统HDFS</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-状态模式/">设计模式理论篇 | 状态模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-策略模式/">设计模式理论篇 | 策略模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-代理模式/">设计模式理论篇 | 代理模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-外观模式/">设计模式理论篇 | 外观模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-观察者模式/">设计模式理论篇 | 观察者模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/24/设计模式理论篇-命令模式/">设计模式理论篇 | 命令模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/23/设计模式理论篇-适配器模式/">设计模式理论篇 | 适配器模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
