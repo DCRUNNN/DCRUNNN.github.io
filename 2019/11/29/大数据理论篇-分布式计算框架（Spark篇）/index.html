@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式计算框架（Spark篇） | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式计算框架（Spark篇）</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式计算框架（Spark篇）</h1><div class="post-meta">Nov 29, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spark"><span class="toc-text">Spark</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#（一）-Spark简介"><span class="toc-text">（一） Spark简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（二）-Spark原理"><span class="toc-text">（二） Spark原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD"><span class="toc-text">RDD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD操作（Operator）"><span class="toc-text">RDD操作（Operator）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD依赖（Dependency）"><span class="toc-text">RDD依赖（Dependency）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#示例：WordCount"><span class="toc-text">示例：WordCount</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#抽象模式"><span class="toc-text">抽象模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local模式"><span class="toc-text">Local模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Standalone模式"><span class="toc-text">Standalone模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#YARN模式"><span class="toc-text">YARN模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（三）-任务监控"><span class="toc-text">（三） 任务监控</span></a></li></ol></li></ol></div></div><div class="post-content"><h1 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h1><h2 id="（一）-Spark简介"><a href="#（一）-Spark简介" class="headerlink" title="（一） Spark简介"></a>（一） Spark简介</h2><p><strong>a) 产生背景</strong></p>
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式计算框架（Spark篇） | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式计算框架（Spark篇）</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式计算框架（Spark篇）</h1><div class="post-meta">Nov 29, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spark"><span class="toc-text">Spark</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#（一）-Spark简介"><span class="toc-text">（一） Spark简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（二）-Spark原理"><span class="toc-text">（二） Spark原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD数据结构"><span class="toc-text">RDD数据结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建RDD的方式"><span class="toc-text">创建RDD的方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD操作类型（Operator）"><span class="toc-text">RDD操作类型（Operator）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RDD依赖（Dependency）"><span class="toc-text">RDD依赖（Dependency）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#示例：WordCount"><span class="toc-text">示例：WordCount</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#抽象模式"><span class="toc-text">抽象模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Local模式"><span class="toc-text">Local模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Standalone模式"><span class="toc-text">Standalone模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#YARN模式"><span class="toc-text">YARN模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mesos模式"><span class="toc-text">Mesos模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#（三）-任务监控"><span class="toc-text">（三） 任务监控</span></a></li></ol></li></ol></div></div><div class="post-content"><h1 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h1><h2 id="（一）-Spark简介"><a href="#（一）-Spark简介" class="headerlink" title="（一） Spark简介"></a>（一） Spark简介</h2><p><strong>a) 产生背景</strong></p>
 <ol>
 <li>MapReduce有较大局限性<ul>
 <li>仅支持Map、Reduce两种语义操作</li>
@@ -42,6 +42,7 @@
 <li>利用内存计算、Cache缓存机制，支持迭代计算和数据共享，减少数据读取的IO开销</li>
 <li>利用DAG引擎，减少中间计算结果写入HDFS的开销</li>
 <li>利用多线程池模型，减少任务启动开销，避免Shuffle中不必要的排序和磁盘IO操作</li>
+<li>不同于MapReduce将中间计算结果放入磁盘中，Spark采用内存存储中间计算结果，减少了迭代运算的磁盘IO，并通过并行计算DAG图的优化，减少了不同任务之间的依赖，降低了延迟等待时间。内存计算下，Spark 比 MapReduce 快100倍。</li>
 </ul>
 <ol start="2">
 <li>通用易用</li>
@@ -49,6 +50,8 @@
 <ul>
 <li>适用于批处理、流处理、交互式计算、机器学习算法等场景</li>
 <li>提供了丰富的开发API，支持Scala、Java、Python、R等</li>
+<li>Spark提供了统一的解决方案。Spark可以用于批处理、交互式查询（Spark SQL）、实时流处理（Spark Streaming）、机器学习（Spark MLlib）和图计算（GraphX）。</li>
+<li>不同于MapReduce仅支持Map和Reduce两种编程算子，Spark提供了超过80种不同的Transformation和Action算子，如map,reduce,filter,groupByKey,sortByKey,foreach等，并且采用函数式编程风格，实现相同的功能需要的代码量极大缩小</li>
 </ul>
 <ol start="3">
 <li>运行模式多样</li>
@@ -58,33 +61,82 @@
 <li>Standalone模式</li>
 <li>YARN/Mesos模式</li>
 </ul>
-<h2 id="（二）-Spark原理"><a href="#（二）-Spark原理" class="headerlink" title="（二） Spark原理"></a>（二） Spark原理</h2><p><strong>a) 编程模型</strong></p>
-<h3 id="RDD"><a href="#RDD" class="headerlink" title="RDD"></a>RDD</h3><ul>
-<li>弹性分布式数据集（Resilient Distributed Datasets）<ul>
-<li>分布在集群中的只读对象集合</li>
+<ol start="4">
+<li>兼容性</li>
+</ol>
+<ul>
+<li>Spark能够跟很多开源工程兼容使用。如Spark可以使用Hadoop的YARN和Apache Mesos作为它的资源管理和调度器，并且Spark可以读取多种数据源，如HDFS、HBase、MySQL等。</li>
+</ul>
+<h2 id="（二）-Spark原理"><a href="#（二）-Spark原理" class="headerlink" title="（二） Spark原理"></a>（二） Spark原理</h2><p><strong>a) 基本概念</strong></p>
+<ul>
+<li>RDD：是弹性分布式数据集（Resilient Distributed Dataset）的简称，是分布式内存的一个抽象概念，提供了一种高度受限的共享内存模型。</li>
+<li>DAG：是Directed Acyclic Graph（有向无环图）的简称，反映RDD之间的依赖关系。</li>
+<li>Driver Program：控制程序，负责为Application构建DAG图。</li>
+<li>Cluster Manager：集群资源管理中心，负责分配计算资源。</li>
+<li>Worker Node：工作节点，负责完成具体计算。</li>
+<li>Executor：是运行在工作节点（Worker Node）上的一个进程，负责运行Task，并为应用程序存储数据。</li>
+<li>Application：用户编写的Spark应用程序，一个Application包含多个Job。</li>
+<li>Job：作业，一个Job包含多个RDD及作用于相应RDD上的各种操作。</li>
+<li>Stage：阶段，是作业的基本调度单位，一个作业会分为多组任务，每组任务被称为“阶段”。</li>
+<li>Task：任务，是运行在Executor上的工作单元，是Executor中的一个线程。</li>
+</ul>
+<p><strong>总结</strong>：Application由多个Job组成，Job由多个Stage组成，Stage由多个Task组成。Stage是作业调度的基本单位。</p>
+<p><strong>b) 架构设计</strong></p>
+<ul>
+<li>Spark集群由Driver, Cluster Manager（Standalone,Yarn 或 Mesos），以及Worker Node组成。对于每个Spark应用程序，Worker Node上存在一个Executor进程，Executor进程中包括多个Task线程。<br><img src="/images/big_data/Spark/structure.png" alt="">  </li>
+</ul>
+<p><strong>c) Spark运行流程</strong></p>
+<ol>
+<li>Application首先被Driver构建DAG图并分解成Stage</li>
+<li>然后Driver向Cluster Manager申请资源</li>
+<li>Cluster Manager向某些Work Node发送征召信号</li>
+<li>被征召的Work Node启动Executor进程响应征召，并向Driver申请任务</li>
+<li>Driver分配Task给Work Node。</li>
+<li>Executor以Stage为单位执行Task，期间Driver进行监控。</li>
+<li>Driver收到Executor任务完成的信号后向Cluster Manager发送注销信号。</li>
+<li>Cluster Manager向Work Node发送释放资源信号。</li>
+<li>Work Node对应Executor停止运行。</li>
+</ol>
+<p><img src="/images/big_data/Spark/operation_process.jpg" alt="">  </p>
+<p><strong>Spark运行架构特点：</strong></p>
+<ul>
+<li>每个Application都有自己专属的Executor进程，并且该进程在Application运行期间一直驻留。Executor进程以多线程的方式运行Task</li>
+<li>Spark运行过程与资源管理器无关，只要能够获取Executor进程并保持通信即可</li>
+<li>Task采用了数据本地性和推测执行等优化机制</li>
+</ul>
+<p><strong>c) 编程模型</strong></p>
+<h3 id="RDD数据结构"><a href="#RDD数据结构" class="headerlink" title="RDD数据结构"></a>RDD数据结构</h3><ul>
+<li>RDD全称弹性分布式数据集（Resilient Distributed Datasets）<ul>
+<li>分布在集群中的只读对象集合，是记录的只读分区集合</li>
 <li>由多个Partition组成</li>
 <li>通过转换操作构造</li>
 <li>失效后自动重构（弹性）</li>
 <li>存储在内存或磁盘中</li>
 </ul>
 </li>
-<li>Spark基于RDD进行计算</li>
+<li>Spark基于RDD进行计算，RDD是Spark的基本数据结构</li>
 </ul>
-<h3 id="RDD操作（Operator）"><a href="#RDD操作（Operator）" class="headerlink" title="RDD操作（Operator）"></a>RDD操作（Operator）</h3><ol>
-<li>Transformation（转换）<ul>
+<h3 id="创建RDD的方式"><a href="#创建RDD的方式" class="headerlink" title="创建RDD的方式"></a>创建RDD的方式</h3><ol>
+<li>读取文件中的数据生成RDD</li>
+<li>将内存中的对象并行化得到RDD</li>
+<li>可以通过已有的RDD转换产生新的RDD</li>
+</ol>
+<h3 id="RDD操作类型（Operator）"><a href="#RDD操作类型（Operator）" class="headerlink" title="RDD操作类型（Operator）"></a>RDD操作类型（Operator）</h3><ol>
+<li>Transformation（转换）操作<ul>
 <li>将Scala集合或Hadoop输入数据构造成一个新的RDD</li>
 <li>通过已有的RDD产生新的RDD</li>
 <li>惰性执行：只记录转换关系，不触发计算</li>
 <li>例如：map、filter、flatmap、union、distinct、sortbykey</li>
 </ul>
 </li>
-<li>Action（动作）<ul>
+<li>Action（动作）操作<ul>
 <li>通过RDD计算得到一个值或一组值</li>
-<li>真正触发计算</li>
+<li>真正触发SparkContext提交Job作业，进行计算，返回结果到Driver</li>
 <li>例如：first、count、collect、foreach、saveAsTextFile</li>
 </ul>
 </li>
 </ol>
+<p><strong>Transoformation操作有lazy特性，即Spark不会立刻进行实际的计算，智慧记录执行的轨迹，只有触发Action操作时，它才会根据DAG图真正执行</strong></p>
 <p>示例：RDD的两种操作</p>
 <ul>
 <li>rdd1.map(_ ,+1).saveAsTextFile(“hdfs://node01:9000”)</li>
@@ -102,12 +154,17 @@
 </ol>
 <ul>
 <li>子RDD分区依赖父RDD的所有分区</li>
+<li>宽依赖关系相关的操作一般具有shuffle过程，即通过一个partitioner函数将父RDD中每个分区上key不同的记录分发到不同的子RDD分区</li>
 <li>子RDD的部分或全部分区数据丢失或损坏，从所有父RDD分区重新计算，必须进行Shuffle</li>
 <li>相对于窄依赖，宽依赖付出的代价要高很多，尽量避免使用 </li>
 <li>例如：groupByKey、reduceByKey、sortByKey</li>
 </ul>
+<p><img src="/images/big_data/Spark/dependency.jpg" alt=""><br><strong>依赖关系确定了DAG切分成Stage的方式</strong></p>
+<ul>
+<li>切割规则：从后往前，遇到宽依赖就切割Stage。</li>
+</ul>
 <h3 id="示例：WordCount"><a href="#示例：WordCount" class="headerlink" title="示例：WordCount"></a>示例：WordCount</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">val rdd1 = sc.textFile(“hdfs://node01:9000/data/wc/in”) </span><br><span class="line">val rdd2 = rdd1.flatMap(_.split(“\t”)) </span><br><span class="line">val rdd3 = rdd2.map((_,1)) </span><br><span class="line">val rdd4 = rdd3.reduceByKey((_+_)) </span><br><span class="line">rdd4.saveAsTextFile(“hdfs://node01:9000/data/wc/out”)</span><br></pre></td></tr></table></figure>
-<p><strong>b) 运行模式</strong></p>
+<p><strong>d) 运行模式</strong></p>
 <h3 id="抽象模式"><a href="#抽象模式" class="headerlink" title="抽象模式"></a>抽象模式</h3><ol>
 <li>Driver<ul>
 <li>一个Spark程序有一个Driver，一个Driver创建一个SparkContext，程序的main函数运行在Driver中</li>
@@ -128,38 +185,42 @@
 </li>
 </ol>
 <h3 id="Local模式"><a href="#Local模式" class="headerlink" title="Local模式"></a>Local模式</h3><ul>
-<li>单机运行，通常用于测试</li>
+<li>单机本地运行，通常用于测试</li>
 <li>Spark程序以多线程方式直接运行在本地 </li>
 </ul>
 <h3 id="Standalone模式"><a href="#Standalone模式" class="headerlink" title="Standalone模式"></a>Standalone模式</h3><ul>
-<li>Spark集群独立运行，不依赖于第三方资源管理系统，如：YARN、Mesos</li>
+<li>Spark集群独立运行，使用Spark自带的集群管理器，后台只能运行Spark任务。不依赖于第三方资源管理系统，如：YARN、Mesos</li>
 <li>采用Master/Slave架构</li>
 <li>Driver在Worker中运行，Master只负责集群管理</li>
 <li>ZooKeeper负责Master HA，避免单点故障</li>
 <li>适用于集群规模不大，数据量不大的情况</li>
 </ul>
-<h3 id="YARN模式"><a href="#YARN模式" class="headerlink" title="YARN模式"></a>YARN模式</h3><p>YARN模式：</p>
-<ul>
+<h3 id="YARN模式"><a href="#YARN模式" class="headerlink" title="YARN模式"></a>YARN模式</h3><ul>
+<li>Hadoop集群管理器，部署后可以同时运行MR、Spark、Storm、HBase等各种任务<br>YARN模式：</li>
 <li>YARN-Client模式：适用于交互和调试</li>
 <li>YARN-Cluster模式：适用于生产环境</li>
 </ul>
-<p><strong>c) 运行过程</strong></p>
+<h3 id="Mesos模式"><a href="#Mesos模式" class="headerlink" title="Mesos模式"></a>Mesos模式</h3><ul>
+<li>与Yarn最大的不同是Mesos 的资源分配是二次的，Mesos负责分配一次，计算框架可以选择接受或者拒绝。</li>
+</ul>
+<p><strong>e) 运行过程</strong></p>
 <ol>
 <li>生成逻辑计划</li>
 <li>生成物理计划</li>
 <li>任务调度与执行</li>
 </ol>
-<p><strong>d) DAG任务规划与调度</strong></p>
+<p><strong>f) DAG任务规划与调度</strong></p>
 <ol>
 <li>DAG（Directed Acyclic Graph）<ul>
 <li>有向无环图：一个有向图无法从任意顶点出发经过若干条边回到该点</li>
 <li>受制于某些任务必须比另一些任务较早执行的约束，可排序为一个队列的任务集合，该队列可由一个DAG图呈现</li>
-<li>Spark程序的内部执行逻辑可由DAG描述，顶点代表任务，边代表任务间的依赖约束 </li>
+<li>Spark程序的内部执行逻辑可由DAG描述，顶点代表任务，边代表任务间的依赖约束</li>
+<li><strong>DAG反映了RDD之间的依赖关系</strong></li>
 </ul>
 </li>
 <li>DAGScheduler<ul>
 <li>根据任务的依赖关系建立DAG</li>
-<li>根据依赖关系是否为宽依赖，即是否存在Shuffle，将DAG划分为不同的阶段（Stage）</li>
+<li>根据依赖关系是否为宽依赖，即是否存在Shuffle，将DAG划分为不同的阶段（Stage），如果是窄依赖就将它们放在同一个stage里，遇到宽依赖就断开划分为另一个stage</li>
 <li>将各阶段中的Task组成的TaskSet提交到TaskScheduler </li>
 </ul>
 </li>
@@ -170,7 +231,9 @@
 </ul>
 </li>
 </ol>
+<p><strong>总结</strong>：RDD之间的依赖关系形成一个DAG有向无环图，DAG会提交给DAGScheduler，DAGScheduler会把DAG划分成相互依赖的多个stage，划分stage的依据就是RDD之间的宽窄依赖。遇到宽依赖就划分stage,每个stage包含一个或多个task任务。然后将这些task以taskSet的形式提交给TaskScheduler运行。</p>
 <h2 id="（三）-任务监控"><a href="#（三）-任务监控" class="headerlink" title="（三） 任务监控"></a>（三） 任务监控</h2><ul>
 <li>Web监控：端口4040（以inceptor为例）</li>
 </ul>
-</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/" data-id="ck3ke4xqx002fggubljs9ap59" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADIklEQVR42u3a0WrjQAwF0P7/T2ehT4VuHF3JKbF8/BSCO56jFOSR9PVVvh7f1+/PP7/5eR2v8/vOZ3/17J76E0cXNjY29kXYj8PrmPp7hWcrH/PSoB/v8/gebGxs7K3sNHkcw+ahTNevW7CxsbHvzJ7zKseJSpLDxsbGxp4ksEnJ6RhQ/z7dJzY2NvYd2GmxJg1H+sQPqqVhY2Njfzx70uj9tM9/1N/GxsbG/hj246SrN8qTppl6cerFbrGxsbEXsStFn3pi6zVoK6M/Kb6U2LCxsbHXsXvN3bgoHwbrrOD+Zx1sbGzsFexJ2b1y2EiDVS8b9VIdNjY29n3YJwzEnHrISffw4jM2Njb2IvZZD+i1ECrtgTomHtbBxsbGXsdO27T1A8MEXF8hTqXY2NjYK9hpqzV+3W+N76TNiXif2NjY2IvYkyGb+eGhV8w6a01sbGzsHex64b4Zy/CIcpzw6q3fF7vFxsbGXsTuHR4mG0q/SQMRhBgbGxt7EXtS0J+Xk+rrp2NAwcAQNjY29mXZ9cGayRjNuU2C3m/7tLONjY2NvYidJom0IFVvKjRbtvUwYWNjYy9iT0ZeesmvnurSQFcSbem/ABsbG/uy7Mqi9aXTgc5JM6DXfsDGxsbewU4fmQLS4lSvCRGHFRsbG3sRO33pf3eY5iNEvTYzNjY29nXZ9Rf9+abTlFY/FNV3jo2Njb2P3cxv4Vbqrd+03Tsph2FjY2PvYE/KMWnpp9dUrheqgjYwNjY29g3Yk+GYeum/d/xIh3teHD+wsbGxL86uF2IqAzFpKT9dub5O6R5sbGzsRew0VcxDM8dPfgxsbGzsrezetuopp35sqBw5euM78eOxsbGxL8U+3mh9rKdeNvr7gGJjY2PvYz/CazI0UwnBfCin0qjAxsbG3sSev6u/ox37vvyMjY2NvZU9SVr1+J2bhCalKGxsbOyt7HMTTJrGJntoplVsbGzs27PPKkXNWw5pQwIbGxv7zuzeQGSFWn9uus7TBImNjY29jt0buDz+q3ooewFtpi5sbGzsdey0uD8/uvR60WkIeu1nbGxs7Eux/wE7bgdKL4EHOwAAAABJRU5ErkJggg==">分享</a><div class="tags"><a href="/tags/大数据/">大数据</a><a href="/tags/分布式计算框架/">分布式计算框架</a></div><div class="post-nav"><a class="next" href="/2019/11/29/大数据理论篇-分布式计算框架/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式计算框架/" style="font-size: 15px;">分布式计算框架</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/分布式资源管理框架/" style="font-size: 15px;">分布式资源管理框架</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/矩阵/" style="font-size: 15px;">矩阵</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/">大数据理论篇 | 分布式计算框架（Spark篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（MapReduce篇）/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/设计模式理论篇-桥接模式/">设计模式理论篇 | 桥接模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/算法-最长公共子序列/">算法 | 最长公共子序列</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/算法-直方图和0-1矩阵中最大子矩阵/">算法 | 直方图和0-1矩阵中最大子矩阵</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/大数据理论篇-分布式资源管理框架YARN/">大数据理论篇 | 分布式资源管理框架YARN</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-享元模式/">设计模式理论篇 | 享元模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/大数据理论篇-分布式文件系统HDFS/">大数据理论篇 | 分布式文件系统HDFS</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-状态模式/">设计模式理论篇 | 状态模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+<p>参考资料：<br>[1]<a href="https://mp.weixin.qq.com/s/dontNjAGFyskhHz7tbdWeg" target="_blank" rel="noopener">30分钟理解Spark的基本原理</a></p>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/" data-id="ck3lbl5gk0034vcubsyyac1pv" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADIklEQVR42u3a0WrjQAwF0P7/T2ehT4VuHF3JKbF8/BSCO56jFOSR9PVVvh7f1+/PP7/5eR2v8/vOZ3/17J76E0cXNjY29kXYj8PrmPp7hWcrH/PSoB/v8/gebGxs7K3sNHkcw+ahTNevW7CxsbHvzJ7zKseJSpLDxsbGxp4ksEnJ6RhQ/z7dJzY2NvYd2GmxJg1H+sQPqqVhY2Njfzx70uj9tM9/1N/GxsbG/hj246SrN8qTppl6cerFbrGxsbEXsStFn3pi6zVoK6M/Kb6U2LCxsbHXsXvN3bgoHwbrrOD+Zx1sbGzsFexJ2b1y2EiDVS8b9VIdNjY29n3YJwzEnHrISffw4jM2Njb2IvZZD+i1ECrtgTomHtbBxsbGXsdO27T1A8MEXF8hTqXY2NjYK9hpqzV+3W+N76TNiXif2NjY2IvYkyGb+eGhV8w6a01sbGzsHex64b4Zy/CIcpzw6q3fF7vFxsbGXsTuHR4mG0q/SQMRhBgbGxt7EXtS0J+Xk+rrp2NAwcAQNjY29mXZ9cGayRjNuU2C3m/7tLONjY2NvYidJom0IFVvKjRbtvUwYWNjYy9iT0ZeesmvnurSQFcSbem/ABsbG/uy7Mqi9aXTgc5JM6DXfsDGxsbewU4fmQLS4lSvCRGHFRsbG3sRO33pf3eY5iNEvTYzNjY29nXZ9Rf9+abTlFY/FNV3jo2Njb2P3cxv4Vbqrd+03Tsph2FjY2PvYE/KMWnpp9dUrheqgjYwNjY29g3Yk+GYeum/d/xIh3teHD+wsbGxL86uF2IqAzFpKT9dub5O6R5sbGzsRew0VcxDM8dPfgxsbGzsrezetuopp35sqBw5euM78eOxsbGxL8U+3mh9rKdeNvr7gGJjY2PvYz/CazI0UwnBfCin0qjAxsbG3sSev6u/ox37vvyMjY2NvZU9SVr1+J2bhCalKGxsbOyt7HMTTJrGJntoplVsbGzs27PPKkXNWw5pQwIbGxv7zuzeQGSFWn9uus7TBImNjY29jt0buDz+q3ooewFtpi5sbGzsdey0uD8/uvR60WkIeu1nbGxs7Eux/wE7bgdKL4EHOwAAAABJRU5ErkJggg==">分享</a><div class="tags"><a href="/tags/大数据/">大数据</a><a href="/tags/分布式计算框架/">分布式计算框架</a></div><div class="post-nav"><a class="pre" href="/2019/11/30/大数据理论篇-分布式ETL工具Sqoop/">大数据理论篇 | 分布式ETL工具Sqoop</a><a class="next" href="/2019/11/29/大数据理论篇-分布式计算框架（MapReduce篇）/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式数据采集工具/" style="font-size: 15px;">分布式数据采集工具</a> <a href="/tags/分布式ETL工具/" style="font-size: 15px;">分布式ETL工具</a> <a href="/tags/分布式计算框架/" style="font-size: 15px;">分布式计算框架</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/分布式资源管理框架/" style="font-size: 15px;">分布式资源管理框架</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/矩阵/" style="font-size: 15px;">矩阵</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式数据采集工具Flume/">大数据理论篇 | 分布式数据采集工具Flume</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式ETL工具Sqoop/">大数据理论篇 | 分布式ETL工具Sqoop</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/">大数据理论篇 | 分布式计算框架（Spark篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（MapReduce篇）/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/设计模式理论篇-桥接模式/">设计模式理论篇 | 桥接模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/算法-最长公共子序列/">算法 | 最长公共子序列</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/算法-直方图和0-1矩阵中最大子矩阵/">算法 | 直方图和0-1矩阵中最大子矩阵</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/大数据理论篇-分布式资源管理框架YARN/">大数据理论篇 | 分布式资源管理框架YARN</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-享元模式/">设计模式理论篇 | 享元模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

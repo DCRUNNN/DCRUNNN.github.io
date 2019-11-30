@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式ETL工具Sqoop | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式ETL工具Sqoop</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式ETL工具Sqoop</h1><div class="post-meta">Nov 30, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#分布式ETL工具Sqoop"><span class="toc-text">分布式ETL工具Sqoop</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#零、-写在前面"><span class="toc-text">零、 写在前面</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、-Sqoop简介"><span class="toc-text">一、 Sqoop简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）什么是Sqoop"><span class="toc-text">1）什么是Sqoop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）Sqoop版本"><span class="toc-text">2）Sqoop版本</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、-Sqoop原理"><span class="toc-text">二、 Sqoop原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）数据导入"><span class="toc-text">1）数据导入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）数据导出"><span class="toc-text">2）数据导出</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、-Sqoop使用"><span class="toc-text">三、 Sqoop使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）基本用法"><span class="toc-text">1）基本用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）进阶用法"><span class="toc-text">2）进阶用法</span></a></li></ol></li></ol></li></ol></div></div><div class="post-content"><h1 id="分布式ETL工具Sqoop"><a href="#分布式ETL工具Sqoop" class="headerlink" title="分布式ETL工具Sqoop"></a>分布式ETL工具Sqoop</h1><h2 id="零、-写在前面"><a href="#零、-写在前面" class="headerlink" title="零、 写在前面"></a>零、 写在前面</h2><ul>
+<li>ETL，是英文Extract-Transform-Load的缩写，用来描述将数据从来源端经过抽取（extract）、转换（transform）、加载（load）至目的端的过程。</li>
+<li>ETL一词较常用在数据仓库，但其对象并不限于数据仓库。</li>
+<li>ETL是将业务系统的数据经过抽取、清洗转换之后加载到数据仓库的过程，目的是将企业中的分散、零乱、标准不统一的数据整合到一起，为企业的决策提供分析依据。</li>
+<li>ETL是BI（商业智能）项目重要的一个环节。</li>
+<li>Sqoop最早期是Hadoop的模块，所以Sqoop底层做的是MapReduce任务，通过将我们的导入导出命令翻译成MapReduce程序来完成作业，通过MapReduce将数据从数据库导到HDFS，或是从HDFS导入数据库。这一点和我们的Hive类似。</li>
+</ul>
+<h2 id="一、-Sqoop简介"><a href="#一、-Sqoop简介" class="headerlink" title="一、 Sqoop简介"></a>一、 Sqoop简介</h2><h3 id="1）什么是Sqoop"><a href="#1）什么是Sqoop" class="headerlink" title="1）什么是Sqoop"></a>1）什么是Sqoop</h3><ul>
+<li>Sqoop项目始于2009年，早期为Hadoop的第三方模块，后来成为Apache的独立项目</li>
+<li>Sqoop是一个主要在Hadoop和关系数据库之间进行批量数据迁移的工具<ul>
+<li>Hadoop：HDFS、Hive、HBase、Inceptor、Hyperbase</li>
+<li>面向大数据集的批量导入导出<ul>
+<li>将输入数据集分为N个切片，然后启动N个Map任务并行传输 </li>
+</ul>
+</li>
+<li>支持全量、增量两种传输方式</li>
+</ul>
+</li>
+<li>提供多种Sqoop连接器<ol>
+<li>内置连接器<ul>
+<li>经过优化的专用RDBMS（关系数据库管理系统）连接器：MySQL、PostgreSQL、Oracle、DB2、SQL Server、Netzza等 </li>
+<li>通用的JDBC连接器：支持JDBC协议的数据库</li>
+</ul>
+</li>
+<li>第三方连接器：<ul>
+<li>数据仓库：Teradata</li>
+<li>NoSQL数据库：Couchbase</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="2）Sqoop版本"><a href="#2）Sqoop版本" class="headerlink" title="2）Sqoop版本"></a>2）Sqoop版本</h3><ol>
+<li>Sqoop1 与Sqoop2 的区别<br><img src="/images/big_data/Sqoop/version.png" alt="">  </li>
+</ol>
+<ul>
+<li>二者完全不兼容，无法平滑升级</li>
+<li>Sqoop1优缺点<ul>
+<li>优点：<ul>
+<li>架构简单</li>
+<li>部署简单</li>
+<li>功能全面</li>
+<li>稳定性较高</li>
+<li>速度较快</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>访问方式单一</li>
+<li>命令行方式容易出错，格式紧耦合</li>
+<li>安全机制不够完善，存在密码泄露风险</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Sqoop2优缺点<ul>
+<li>优点：<ul>
+<li>访问方式多样</li>
+<li>集中管理连接器</li>
+<li>安全机制较完善</li>
+<li>支持多用户</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>架构较复杂</li>
+<li>部署较繁琐</li>
+<li>稳定性一般</li>
+<li>速度一般</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>实际工作中推荐使用Sqoop1，至于角色多用户的问题，在实际中数据采集操作基本上是一个人完成的</li>
+</ul>
+<h2 id="二、-Sqoop原理"><a href="#二、-Sqoop原理" class="headerlink" title="二、 Sqoop原理"></a>二、 Sqoop原理</h2><ol>
+<li>Sqoop主要是负责Hadoop与RDBMS之间的数据迁移，即从Hadoop文件系统 导出数据到RDBMS,从RDBMS导入数据到Hadoop hdfs,hive,hbase等数据存储系统。</li>
+<li>其实就是将 sqoop命令转换成MR程序来完成数据的迁移。</li>
+<li>本质就是执行和计算，依赖于hdfs存储数据，把sql转换成程序</li>
+</ol>
+<h3 id="1）数据导入"><a href="#1）数据导入" class="headerlink" title="1）数据导入"></a>1）数据导入</h3><ul>
+<li>数据导入是指从RDBMS（关系数据库管理系统）将数据导入到Hadoop File System中</li>
+</ul>
+<p><img src="/images/big_data/Sqoop/import.png" alt=""><br><img src="/images/big_data/Sqoop/import2.png" alt=""> </p>
+<ul>
+<li>数据导入过程：<ol>
+<li>Sqoop通过JDBC从数据库获取需要的元数据，如表的列名、数据类型等。这里假设导入的表名为Person表</li>
+<li>Sqoop将获取到的数据库数据类型（varchar、number等）映射成Java数据类型（String、int等），并生成一个与表名相同的类，如Person.java源文件，该文件实现了Writable接口，该文件生成在Sqoop执行的目录下，这个类的作用是完成序列化/反序列化工作，并且保存数据库表中的每一行记录。</li>
+<li>Sqoop启动MapReduce作业</li>
+<li>Map作业阶段读取数据库输入的过程中，是通过JDBC读取数据库表中的数据记录，此时会用Sqoop生成的Person.java类进行<strong>反序列化</strong></li>
+<li>Map作业阶段输出数据写入HDFS，此时也是用Sqoop生成的Person.java类进行<strong>序列化</strong>，Sqoop默认导出格式为CSV</li>
+</ol>
+</li>
+<li>说明：<ol>
+<li>Map多任务导入时，会对表的数据进行水平切分（默认按主键列），切分数（即Map任务数）由命令’-m’确定，如： -m 1 为单行，只有一个SQL</li>
+<li>每个任务执行的SQL：如<ul>
+<li>SELECT column1, column2, column3 FROM TABLE WHERE id &gt;= 0 AND id &lt; 50000;</li>
+<li>SELECT column1, column2, column3 FROM TABLE WHERE id &gt;= 50000 AND id &lt; 100000;</li>
+<li>……</li>
+</ul>
+</li>
+<li>如果数据id分布不均匀，水平切分会出现数据倾斜</li>
+<li>使用Sqoop进行并行导入的话，切分列的数据会很大程度地影响性能，如果在均匀分布的情况下，性能最好。在最坏的情况下，数据严重倾斜，所有数据都集中在某一个切分区中，那么此时的性能与串行导入没有差别，所以，在导入之前，有必要对切分列的数据进行抽样检测，了解数据的分布。</li>
+</ol>
+</li>
+</ul>
+<h3 id="2）数据导出"><a href="#2）数据导出" class="headerlink" title="2）数据导出"></a>2）数据导出</h3><ul>
+<li>数据导出是指从Hadoop文件系统中将数据导出到RDBMS中</li>
+</ul>
+<p><img src="/images/big_data/Sqoop/export.png" alt=""><br><img src="/images/big_data/Sqoop/export2.png" alt=""> </p>
+<ul>
+<li>数据导出过程：<ol>
+<li>Sqoop通过JDBC从数据库获取目标表结构，如表的列名、数据类型等，这里依然以Person表为例进行说明</li>
+<li>Sqoop将获取到的数据库数据类型（varchar、number等）映射成Java数据类型（String、int等），并生成一个与表名相同的类，如Person.java源文件，该文件实现Writable接口，生成在Sqoop执行的目录下。</li>
+<li>Sqoop启动MapReduce作业</li>
+<li>Map阶段从HDFS读取数据输入，在此过程中，是通过JDBC读取表数据文件，用Sqoop生成的Person.java类进行<strong>反序列化</strong></li>
+<li>Map阶段色输出数据，写入数据库时，生成一批Insert语句，每条语句都会向数据库中插入多条数据记录</li>
+</ol>
+</li>
+</ul>
+<p>参考资料：<br>[1]<a href="https://blog.csdn.net/weixin_39469127/article/details/89894181" target="_blank" rel="noopener">Sqoop导入导出过程笔记</a><br>[2]<a href="https://blog.csdn.net/qq_43193797/article/details/86497217" target="_blank" rel="noopener">Sqoop导入导出过程原理</a></p>
+<h2 id="三、-Sqoop使用"><a href="#三、-Sqoop使用" class="headerlink" title="三、 Sqoop使用"></a>三、 Sqoop使用</h2><h3 id="1）基本用法"><a href="#1）基本用法" class="headerlink" title="1）基本用法"></a>1）基本用法</h3><ol>
+<li>全量数据导入</li>
+<li>基于递增列的增量数据导入（Append方式）</li>
+<li>基于时间列的增量数据导入（LastModified方式<ul>
+<li>对比Append方式，LastModified方式可导入更新数据</li>
+</ul>
+</li>
+</ol>
+<h3 id="2）进阶用法"><a href="#2）进阶用法" class="headerlink" title="2）进阶用法"></a>2）进阶用法</h3><ol>
+<li>从Oracle分区表中导入数据</li>
+<li>并发导入<ul>
+<li>通过-m参数，设置多个Map任务，实现数据并发导入</li>
+<li>-m大于1时，必须设置–split-by，并利用哈希取模实现数据均匀切片，避免数据倾斜</li>
+</ul>
+</li>
+<li>并发度控制 </li>
+</ol>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/11/30/大数据理论篇-分布式ETL工具Sqoop/" data-id="ck3lbl5g1002nvcubc85351w9" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvUlEQVR42u3awW7bQAwEUP//T6dATwUKKzPkblwUTydDduR9G0Ckh3q94uPr9/Hn63dH+7d/fzK5zuEDDw8Pb7T05+U+f2VCfb7auy1IznyzxXh4eHjXeMkNfb+UvFS0G/T2PB4eHt5HeUkTnC/x+TweHh7e/8F7bqZnTXbSyrctPh4eHt7P8PKvSUpFuxFtMbiSteDh4eF1U6p6APbZ19fne3h4eHijqXo+Emv/No8zNqvFw8PDu8FLHnWaFYk2zmib7KJg4OHh4V3mJXHDLDjYBBbtJ98WBjw8PLxDvPZ3/eaxgGQkNntU60CMi4eHhzfitaOv2WBsP2Yb/iTAw8PDu8ZLbtP5FZJAIXm3LSR4eHh493j5TX82+to35Xk7joeHh3ebN2uL8zF/HlXkJacoKnh4eHgXeDca3H2ZacMLPDw8vJ/n3VhK3nDnm5s37q/8Qnh4eHgLXjsAa2PfWTwxi4aj/yEeHh7egrePU9sb9KZNrx8gwMPDw7vAy6dFyfn8tp6UnLytr38x4OHh4S14+QBs/24+EovChbylxsPDw/tB3uyhq1PblMccxXwPDw8P7xBvBmtv6PnQqw0vohgXDw8Pb83Lg4bNrX8Wv86Cj2G+goeHhzfitWHBLIptF7pi4+Hh4V3gtZHBPobYjNDyb/wma8HDw8Nb89rltiFCOxi7MnLDw8PDO8p7vokn558b6/32bd7Fw8PDu8ebPSCVjPw3pH3ZwMPDwzvL+yqPWaCQF4nZdrwtUXh4eHgXeG0c0Da4ScO9+WTe0OPh4eGd5e2LQf64wCxEzkdxq+kZHh4eXslLisGmVLTN9KnxGB4eHt6/wEsi17zAvEZHsR14eHh4H+XlY6pZAJFEt+2DDnh4eHj3eLOIIQ9w29iiHYAdyFrw8PDw1vP0vGmeBRmzoLZt7vHw8PCO8n4BegFf9Pr3G2cAAAAASUVORK5CYII=">分享</a><div class="tags"><a href="/tags/大数据/">大数据</a><a href="/tags/分布式ETL工具/">分布式ETL工具</a></div><div class="post-nav"><a class="pre" href="/2019/11/30/大数据理论篇-分布式数据采集工具Flume/">大数据理论篇 | 分布式数据采集工具Flume</a><a class="next" href="/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/">大数据理论篇 | 分布式计算框架（Spark篇）</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://dcrunnn.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式数据采集工具/" style="font-size: 15px;">分布式数据采集工具</a> <a href="/tags/分布式ETL工具/" style="font-size: 15px;">分布式ETL工具</a> <a href="/tags/分布式计算框架/" style="font-size: 15px;">分布式计算框架</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/分布式资源管理框架/" style="font-size: 15px;">分布式资源管理框架</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/矩阵/" style="font-size: 15px;">矩阵</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式数据采集工具Flume/">大数据理论篇 | 分布式数据采集工具Flume</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式ETL工具Sqoop/">大数据理论篇 | 分布式ETL工具Sqoop</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/">大数据理论篇 | 分布式计算框架（Spark篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（MapReduce篇）/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/设计模式理论篇-桥接模式/">设计模式理论篇 | 桥接模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/27/算法-最长公共子序列/">算法 | 最长公共子序列</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/算法-直方图和0-1矩阵中最大子矩阵/">算法 | 直方图和0-1矩阵中最大子矩阵</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/26/大数据理论篇-分布式资源管理框架YARN/">大数据理论篇 | 分布式资源管理框架YARN</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/25/设计模式理论篇-享元模式/">设计模式理论篇 | 享元模式</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
