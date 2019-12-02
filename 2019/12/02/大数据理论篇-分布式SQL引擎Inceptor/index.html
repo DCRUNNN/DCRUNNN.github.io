@@ -1,0 +1,303 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>大数据理论篇 | 分布式SQL引擎Inceptor | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">大数据理论篇 | 分布式SQL引擎Inceptor</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">大数据理论篇 | 分布式SQL引擎Inceptor</h1><div class="post-meta">Dec 2, 2019<span> | </span><span class="category"><a href="/categories/大数据/">大数据</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、-Inceptor简介"><span class="toc-text">一、 Inceptor简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）什么是Inceptor"><span class="toc-text">1）什么是Inceptor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）Inceptor适用场景"><span class="toc-text">2）Inceptor适用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3）项目应用"><span class="toc-text">3）项目应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、-Inceptor原理"><span class="toc-text">二、 Inceptor原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）系统架构"><span class="toc-text">1）系统架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）数据模型"><span class="toc-text">2）数据模型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、-Inceptor-SQL"><span class="toc-text">三、 Inceptor SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1）SQL数据类型"><span class="toc-text">1）SQL数据类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2）SQL-DDL"><span class="toc-text">2）SQL DDL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3）SQL-DML"><span class="toc-text">3）SQL DML</span></a></li></ol></li></ol></div></div><div class="post-content"><h2 id="一、-Inceptor简介"><a href="#一、-Inceptor简介" class="headerlink" title="一、 Inceptor简介"></a>一、 Inceptor简介</h2><h3 id="1）什么是Inceptor"><a href="#1）什么是Inceptor" class="headerlink" title="1）什么是Inceptor"></a>1）什么是Inceptor</h3><ul>
+<li>概念<ul>
+<li>用于<strong>数据仓库</strong>和<strong>交互式分析</strong>的大数据平台软件</li>
+<li>基于Hadoop的数据仓库产品</li>
+<li><strong>分布式通用SQL引擎</strong></li>
+<li>基于<strong>Hive</strong>和<strong>Spark</strong>技术打造 </li>
+</ul>
+</li>
+<li>特点<ol>
+<li>Hadoop领域对SQL支持最完善<ul>
+<li>支持SQL 2003语法与存储过程</li>
+<li>业内唯一支持Oracle方言</li>
+<li>业内唯一支持DB2方言</li>
+<li>业内唯一支持Teradata方言</li>
+<li>帮助用户低成本迁移传统应用</li>
+</ul>
+</li>
+<li>支持完整分布式事务处理<ul>
+<li>保证分布式事务处理的<strong>ACID特性</strong></li>
+<li>支持<strong>批量增删改查</strong>的分布式事务处理</li>
+<li>使用MVCC（Multi-Version Concurrency Control）算法自动提供并发控制</li>
+</ul>
+</li>
+<li>优异的大数据处理和分析性能<ul>
+<li>基于内存/SSD的列式存储支持对数十亿条记录的秒级交互式分析</li>
+<li>与Apache Hive相比，数据分析处理速度有显著提升</li>
+<li>对于大规模数据集，数据分析处理速度比MPP有显著提升</li>
+</ul>
+</li>
+<li>提供便捷的SQL、PL/SQL开发调试辅助工具Waterdrop</li>
+</ol>
+</li>
+</ul>
+<h3 id="2）Inceptor适用场景"><a href="#2）Inceptor适用场景" class="headerlink" title="2）Inceptor适用场景"></a>2）Inceptor适用场景</h3><ol>
+<li>离线分析</li>
+<li>批处理</li>
+<li>交互式分析</li>
+<li>图计算、图检索</li>
+</ol>
+<h3 id="3）项目应用"><a href="#3）项目应用" class="headerlink" title="3）项目应用"></a>3）项目应用</h3><ol>
+<li>BI报表工具（JDBC/ODBC）</li>
+<li>SQL IDE开发工具（Waterdrop）</li>
+<li>Web应用系统（JDBC / ODBC）</li>
+<li>数据加工工具（SQL / PLSQL）</li>
+</ol>
+<h2 id="二、-Inceptor原理"><a href="#二、-Inceptor原理" class="headerlink" title="二、 Inceptor原理"></a>二、 Inceptor原理</h2><h3 id="1）系统架构"><a href="#1）系统架构" class="headerlink" title="1）系统架构"></a>1）系统架构</h3><p><img src="/images/big_data/Inceptor/structure.png" alt></p>
+<p><strong>InceptorServer计算引擎</strong></p>
+<ol>
+<li>Connector：为BI、ETL工具提供标准JDBC、ODBC接口</li>
+<li>SQL Compiler<ul>
+<li>SQL Parser：SQL语法解析器</li>
+<li>Rule-based &amp; Cost-based Optimizer：规则和代价优化器</li>
+<li>Code Generator：代码生成器 </li>
+</ul>
+</li>
+<li>PL/SQL Compiler<ul>
+<li>Procedure Parser：存储过程解析器</li>
+<li>CFG Optimizer：控制流优化器</li>
+<li>Parallel Optimizer：并行优化器</li>
+</ul>
+</li>
+<li>Transaction Manager<ul>
+<li>Distributed CRUD：分布式增删改</li>
+<li>Concurrency Controller：事务并发控制器 </li>
+</ul>
+</li>
+<li>Spark<ul>
+<li>官方认证Transwarp发行版 </li>
+<li>大数据量下的高稳定性、计算效率更高、功能扩展</li>
+</ul>
+</li>
+<li>计算资源<ul>
+<li>Executor是资源调度的基本单元</li>
+<li>Web可视化配置</li>
+</ul>
+</li>
+<li>Metastore<ul>
+<li>存储Inceptor元数据</li>
+<li>元数据主要包括：数据库、表、分区、分桶等信息</li>
+<li>元数据存储在TxSQL（MySQL集群）</li>
+</ul>
+</li>
+<li>Client<ul>
+<li>CLI：Beeline</li>
+<li>JDBC/ODBC</li>
+<li>Web UI<ul>
+<li>HUE：开源的Apache Hadoop UI系统</li>
+<li>Polit：星环打造的轻量级自助式BI分析工具</li>
+</ul>
+</li>
+<li>Waterdrop<ul>
+<li>高效的Inceptor SQL IDE工具</li>
+<li>支持主流的关系数据库和数据仓库，如：Oracle、DB2、MySQL、Hive、Teradata、SAP等</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="2）数据模型"><a href="#2）数据模型" class="headerlink" title="2）数据模型"></a>2）数据模型</h3><p><img src="/images/big_data/Inceptor/dataModel.png" alt></p>
+<p><strong>2.1 数据库（Database）</strong></p>
+<ul>
+<li>数据库是一个包含若干表的命名空间和磁盘目录，类似于RDBMS（关系数据库管理系统）中的数据库</li>
+<li>系统会为每个数据库创建一个目录，目录名=数据库名.db</li>
+<li>通常无法删除包含表的数据库，应该先删除表，再删除数据库</li>
+</ul>
+<p><strong>2.2 表（Table）</strong></p>
+<ul>
+<li>表是数据管理和存储的基本对象，包含若干字段，类似于RDBMS中的表</li>
+<li><strong>表的元数据存储在Metastore中，表的实际数据存储在HDFS、Holodesk、Hyperbase和Search中</strong></li>
+</ul>
+<p><strong>表（Table）的分类：</strong><br>1）按所有权分类 </p>
+<ul>
+<li>托管表（Managed Table，又称内部表、内表）<ol>
+<li>系统具有内表的完全控制权，负责管理它的生命周期</li>
+<li>元数据存储在Metastore中，表数据通常存储在所属数据库目录下的对应子目录中，目录名=表名</li>
+<li>删除内表时，会同时删除表数据，以及Metastore中的元数据</li>
+</ol>
+</li>
+<li>外部表（External Table，又称外表）<ol>
+<li>系统不具有外表的完全控制权</li>
+<li>元数据存储在Metastore中，表数据通常存储在指定的外部存储目录中</li>
+<li>删除外表时，不会删除表数据，但会删除Metastore中的元数据</li>
+</ol>
+</li>
+</ul>
+<p>2）按存储格式分类</p>
+<ul>
+<li>Text表<ol>
+<li>系统默认的表类型，无压缩，行存储，<strong>仅支持批量Insert</strong></li>
+<li>分析查询的性能较低，主要用于导入原始文本数据时建立过渡表</li>
+</ol>
+</li>
+<li>ORC表<ol>
+<li>优化的<strong>列式存储</strong>，轻量级索引，压缩比高，<strong>仅支持批量Insert</strong></li>
+<li>Inceptor计算的主要表类型，适用于<strong>数据仓库的离线分析</strong>，通常由Text表生成</li>
+</ol>
+</li>
+<li>ORC事务表<ol>
+<li>由ORC表衍生而来，继承了ORC表的所有特性，<strong>支持完整CURD（单条和批量Insert、Update、 Delete），以及分布式事务处理</strong></li>
+<li>多版本文件存储，定期做压缩，10~20%的性能损失</li>
+</ol>
+</li>
+<li>Holodesk表<ol>
+<li><strong>基于内存/SSD的列式存储</strong>，内置索引和Cube，速度快，压缩率比ORC表略低，<strong>仅支持批量Insert</strong></li>
+<li>适用于<strong>海量数据的大批量、复杂、高性能查询</strong>，如：<strong>交互式分析和报表可视化展现</strong></li>
+</ol>
+</li>
+<li>Hyperbase表<ol>
+<li>数据存储在Hyperbase上，<strong>支持多种索引，以及Insert、Update、Delete</strong></li>
+<li>适用于<strong>高并发的历史数据查询，支持半结构化、非结构化数据存储</strong></li>
+</ol>
+</li>
+<li>ES表<ol>
+<li>原始数据和索引数据都存储在ElasticSearch中，支持模糊查询和全文检索，适用于综合搜索</li>
+</ol>
+</li>
+</ul>
+<p><strong>2.3 分区（Partition）</strong></p>
+<ul>
+<li>目的：<strong>减少不必要的全表扫描，提升查询效率</strong></li>
+<li>含义：<strong>将表按照某个或某几个字段（分区键）划分为更小的数据集</strong></li>
+<li>分区数据存储于表目录下的子目录中，一个分区对应一个子目录，目录名为“分区键=value” </li>
+<li>如何选择分区键<ul>
+<li>分区键通常高频出现在Select … Where条件查询中</li>
+<li>为了避免产生过多的子目录和小文件，只对离散字段进行分区，如日期、地域、民族等</li>
+<li>由于HDFS不支持大量的子目录，有必要对分区数量进行预估</li>
+<li>预估分区的数据量，避免数据倾斜</li>
+</ul>
+</li>
+</ul>
+<p><strong>2.4 分桶（Bucket）</strong></p>
+<ul>
+<li>含义：通过分桶键哈希取模（key hashcode % N）的方式，将表或分区中的数据随机、均匀地分发到N个桶中，桶数N<strong>一般为质数</strong>，桶编号为0, 1, …, N-1</li>
+<li>作用<ul>
+<li>数据划分：随机均匀</li>
+<li>数据聚合：Key相同的数据在同一个桶中</li>
+</ul>
+</li>
+<li>存储<ul>
+<li>在表或分区目录下，每个桶存储为一个文件</li>
+<li>桶文件的大小应控制在100~200MB之间（ORC表压缩后）</li>
+<li>如果桶文件小于HDFS Block，那么一个桶对应一个Block，否则会存储在多个Block中</li>
+</ul>
+</li>
+<li>作用<ul>
+<li><strong>提高Join查询效率</strong>：如果两个表的Join列都做了分桶，且<strong>分桶数相同或成倍数</strong>，那么<strong>相同列值的数据会分到编号相同或有对应关系的桶中</strong>，这样就<strong>不用全表遍历，对对应的桶做Join就可以了</strong></li>
+<li>提高取样效率：从桶中直接抽取数据</li>
+</ul>
+</li>
+<li>用法<ul>
+<li>通常<strong>先分区后分桶</strong></li>
+<li><strong>分桶键和分桶数在建表时确定，不允许更改</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>2.5 读时模式</strong></p>
+<ul>
+<li>含义：数据写入数据库时，不检查数据的规范性，而是在查询时再验证</li>
+<li>特点：<ul>
+<li>数据写入速度快，适合处理大规模数据</li>
+<li>查询时处理尺度很宽松，尽可能恢复各种错误</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、-Inceptor-SQL"><a href="#三、-Inceptor-SQL" class="headerlink" title="三、 Inceptor SQL"></a>三、 Inceptor SQL</h2><h3 id="1）SQL数据类型"><a href="#1）SQL数据类型" class="headerlink" title="1）SQL数据类型"></a>1）SQL数据类型</h3><ol>
+<li><p>基本数据类型<br><img src="/images/big_data/Inceptor/basicDataType.png" alt></p>
+</li>
+<li><p>复杂数据类型<br><img src="/images/big_data/Inceptor/complexDataType.png" alt></p>
+</li>
+</ol>
+<h3 id="2）SQL-DDL"><a href="#2）SQL-DDL" class="headerlink" title="2）SQL DDL"></a>2）SQL DDL</h3><p>表的高级操作：</p>
+<ol>
+<li>分区</li>
+</ol>
+<ul>
+<li>分区表将数据按分区键的键值存储在表目录的子目录中，目录名为“分区键=键值”</li>
+<li>Inceptor只支持TEXT表、ORC表、CSV表和Holodesk表的分区操作</li>
+<li>单值分区：一个分区对应分区键的一个值</li>
+<li>范围分区：一个分区对应分区键的一个范围（区间）</li>
+</ul>
+<p>1.1 单值分区</p>
+<ul>
+<li>创建单值分区时，<strong>分区键不能和表结构中的列重复</strong>，因为分区键已存储在分区目录名中，分<br>区数据中不包含分区键，否则会造成数据冗余</li>
+<li>单值分区可以分成两类<ul>
+<li>单值静态分区：导入数据时，必须手动指定目标分区</li>
+<li>单值动态分区：导入数据时，系统可以动态判断目标分区</li>
+</ul>
+</li>
+</ul>
+<p>1.2 范围分区</p>
+<ul>
+<li>每个分区对应分区键的一个区间，凡是落在指定区间内的记录都被存储在对应的分区下</li>
+<li>各范围分区按顺序排列，前一个分区的最大值即为后一个分区的最小值</li>
+</ul>
+<ol start="2">
+<li>分桶</li>
+</ol>
+<ul>
+<li>含义：按分桶键哈希取模的方式，将表中数据随机、均匀地分发到若干桶文件中</li>
+<li>目的：通过改变数据的存储分布，提升取样、Join等特定任务的执行效率</li>
+<li><strong>与分区键不同，分桶键必须是表结构中的列</strong></li>
+<li>分桶表在创建的时候只定义Schema，且数据写入时系统不会自动分桶，所以需要先人工分桶再写入</li>
+<li>写入分桶表只能通过Insert，而不能通过Load，因为Load只导入文件，并不分桶 </li>
+<li>如果分桶表创建时定义了排序键，那么数据不仅要分桶，还要排序<ul>
+<li>如果分桶键和排序键不同，且按降序排列，使用Distribute by … Sort by分桶排序</li>
+<li>如果分桶键和排序键相同，且按升序排列（默认），使用Cluster by分桶排序</li>
+</ul>
+</li>
+<li>分桶键和分桶数在建表时确定，不允许更改</li>
+<li>ORC事务表必须分桶</li>
+<li>通常先分区后分桶</li>
+</ul>
+<ol start="3">
+<li>函数操作</li>
+</ol>
+<h3 id="3）SQL-DML"><a href="#3）SQL-DML" class="headerlink" title="3）SQL DML"></a>3）SQL DML</h3><ul>
+<li>数据导入<ul>
+<li>Load导入</li>
+<li>Insert导入</li>
+</ul>
+</li>
+<li>数据导出：Insert导出</li>
+<li>查询：Select…From </li>
+</ul>
+<p>注意：</p>
+<ol>
+<li>常见的DML只能用于ORC事务表、Hyperbase表。例如：单行数据的增删改操作，Insert values Into、Delete、Update</li>
+<li>如果写入<strong>普通表，则将指定的文件或查询结果放入表对应的目录中</strong>，<strong>该目录不能有子目录</strong></li>
+<li>如果写入<strong>分区表，则必须将文件放入对应的分区目录中</strong></li>
+</ol>
+<p><strong>数据导入</strong></p>
+<ol>
+<li>数据预处理：将文件编码转换为UTF-8，将换行符统一为Unix下的换行符\n</li>
+<li>将文件导入表或分区<ul>
+<li>这里有Load导入和Insert导入两种方式</li>
+<li>Load导入不支持动态分区导入，不推荐使用Load导入数据，因为在安全模式下的权限设置步骤较多。推荐的数据导入方法是：创建外表，并将外表Location设置为数据文件所在目录</li>
+<li>Insert导入又有单值静态分区导入、单值动态分区导入之分，静态分区存在的问题是需要手工输入大量的Insert语句，动态分区写入无需手工指定分区，而是让系统根据查询结果自动推断出分区。</li>
+</ul>
+</li>
+</ol>
+<p><strong>数据导出</strong><br>将数据导出到本地或HDFS（Insert导出）</p>
+<ul>
+<li>将查询结果导出到本地目录，可能生成多个文件</li>
+<li>与导入数据不一样，不能用Insert Into导出数据，只能用Insert Overwrite</li>
+</ul>
+<p><strong>Select查询</strong></p>
+<ul>
+<li>过滤：Where、Having</li>
+<li>排序：Order By、Sort By</li>
+<li>分桶与聚合：Distribute By、Cluster By、Group By</li>
+<li>连接：Join</li>
+</ul>
+<p>Distribute By</p>
+<ul>
+<li>通过哈希取模的方式，实现数据按Distribute By列值分桶</li>
+<li>将Distribute By列值相同的数据发送给同一个Reduce任务，实现数据按指定列聚合</li>
+<li>通常与Sort By合并使用，实现先聚合后排序，且Distribute By必须在Sort By之前</li>
+</ul>
+<p>Cluster By</p>
+<ul>
+<li>如果Distribute By列和Sort By列完全相同，且按升序排列，那么Cluster By = Distribute By … Sort By</li>
+</ul>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2019/12/02/大数据理论篇-分布式SQL引擎Inceptor/" data-id="ck3oahc8i000y7kub03kxq9s8" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtUlEQVR42u3aQU4DMQwF0N7/0mUL6jB82zEU6c2qQpDmZTEx33484uf56Xn9yevPXz+/rna/fr7agQcPDw9vsPX7Tedff//5u2+5P4hknYvV8PDw8NZ4ydLJhu4vkvwyOHXl4OHh4b0D7367yYs7v34SKh4eHt5/4SVFeXKp5JvGw8PDezdessUkiu2FsPn1sJi14OHh4cW8vIv0Pp9X+nt4eHh44676JESolsjzOONib3h4eHgLvElEWy2se1FFtS2Hh4eHt83LR5p6I1NJFHsqRL44XDw8PLxlXi94zRtjk8ujGpHg4eHh7fGSkjovuPMVettNjqD8HwMeHh5ei5eMLs232xs76I15ParbwsPDw4t5vcGmXnm9/b0X6+Ph4eEt8ObLbcS4vQYbHh4e3u/w8lihWqHnEXB1NKFQ4uPh4eEt86qv4zxsnW+0isfDw8Pb4/W2lQ+bVkcHejuJkHh4eHhHedWXeP76rl4w+TEVGnJ4eHh4R3m99nxvjDUPL+a8LzEuHh4e3lFetcFfrtPjL5sMs+Lh4eH9Pi/5s/mY1P3vJNdJdcgADw8Pb4M3aYDlV0W1RM6D4B8OBQ8PD2+NlwcBvabUM3jmgfLFmnh4eHgLvF5BPB8O6I1SVY8GDw8Pb4OXfEH11T+JXKvNtlHKgoeHhzfoLuUDAWejit5x5IeOh4eHt8HLF+o1rk7FDdV4Fw8PD2+Plz/V13qVcX+g+Q7x8PDwtnnP4jNvdDVPN2AX8mk8PDy8AW+ydC8mmOCrIw54eHh4e7x8HCq5GJIwd0IqhxR4eHh4a7x86bzAzTeUt9bKWQseHh7en/KqMW4v9u2V3T+U1Hh4eHh/xLsvo3stsWqTLCnuR/ceHh4eXsyrDledHaXKI4k8MsbDw8Pb4/WGrnq/ORlEqMYceHh4eAu8D60Fc6hGrTWPAAAAAElFTkSuQmCC">分享</a><div class="tags"><a href="/tags/大数据/">大数据</a><a href="/tags/分布式SQL引擎/">分布式SQL引擎</a></div><div class="post-nav"><a class="next" href="/2019/11/30/设计模式理论篇-面向对象设计原则/">设计模式理论篇 | 面向对象设计原则</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"><input type="hidden" name="si" value="https://dcrunnn.github.io"><input name="tn" type="hidden" value="bds"><input name="cl" type="hidden" value="3"><input name="ct" type="hidden" value="2097152"><input name="s" type="hidden" value="on"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/分布式计算框架/" style="font-size: 15px;">分布式计算框架</a> <a href="/tags/分布式ETL工具/" style="font-size: 15px;">分布式ETL工具</a> <a href="/tags/分布式SQL引擎/" style="font-size: 15px;">分布式SQL引擎</a> <a href="/tags/分布式消息队列/" style="font-size: 15px;">分布式消息队列</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/分布式数据采集工具/" style="font-size: 15px;">分布式数据采集工具</a> <a href="/tags/分布式资源管理框架/" style="font-size: 15px;">分布式资源管理框架</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/矩阵/" style="font-size: 15px;">矩阵</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/12/02/大数据理论篇-分布式SQL引擎Inceptor/">大数据理论篇 | 分布式SQL引擎Inceptor</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/设计模式理论篇-面向对象设计原则/">设计模式理论篇 | 面向对象设计原则</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/设计模式理论篇-设计模式综述/">设计模式理论篇 | 设计模式综述</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/设计模式理论篇-责任链模式/">设计模式理论篇 | 责任链模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/设计模式理论篇-装饰者模式/">设计模式理论篇 | 装饰者模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式消息队列Kafka/">大数据理论篇 | 分布式消息队列Kafka</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式数据采集工具Flume/">大数据理论篇 | 分布式数据采集工具Flume</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/30/大数据理论篇-分布式ETL工具Sqoop/">大数据理论篇 | 分布式ETL工具Sqoop</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（Spark篇）/">大数据理论篇 | 分布式计算框架（Spark篇）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/29/大数据理论篇-分布式计算框架（MapReduce篇）/">大数据理论篇 | 分布式计算框架（MapReduce篇）</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
