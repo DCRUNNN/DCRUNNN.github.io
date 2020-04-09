@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="DC's Blog"><title>春招积累 | Java基础篇 | Blog of DC</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">春招积累 | Java基础篇</h1><a id="logo" href="/.">Blog of DC</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">春招积累 | Java基础篇</h1><div class="post-meta">Apr 1, 2020<span> | </span><span class="category"><a href="/categories/面试积累/">面试积累</a></span></div><div class="clear"><div class="toc-article" id="toc"><div class="toc-title">文章目录</div></div></div><div class="post-content"><ol>
+<li><p>JVM内存模型<br> 1）宏观说一下，程序计数器、虚拟机栈、本地方法栈、堆、方法区。前面三个线程私有，后面两个线程共享。<br> 注意方法区是JMM的规范，1.8之前是用永久代的方式来实现方法区的，这样可以便于复用垃圾回收机制来管理方法区，但是方法区存储着一些类的元数据，类过多了方法区可能会OOM，1.8中移除永久代，引入元空间，用元空间来实现方法区。将类的相关信息存储在元空间中，字符串池和类的静态变量放入java堆中，元空间是基于本地内存的，这样加载类元数据的能力就由本地内存大小决定了。</p>
+<p> 2）具体说一下：</p>
+<pre><code>a. 程序计数器：线程私有，是当前线程所执行的字节码的行号指示器，正在执行java方法的话，计数器记录的是虚拟机字节码指令的地址（当前指令的地址）。如果是Native方法，则为空。 PC内存区域是唯一一个在虚拟机中没有规定任何OutOfMemoryError情况的区域。 
+
+b. 虚拟机栈：线程私有，每个方法在执行的同时都会创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息。每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程。
+
+c. 本地方法栈：线程私有，与虚拟机栈作用类似, 区别是虚拟机栈为执行Java方法服务, 而本地方法栈则为 Native方法服务
+
+d. 堆：线程共享，创建的对象和数组都保存在 Java 堆内存中，也是垃圾收集器进行垃圾收集的重要的内存区域。分为新生代和老年代，二者空间比例为1:2。新生代中又分为eden区、from survivor区、to survivor区，三者比例（8:1:1）。
+
+e. 方法区：线程共享，存储被 JVM 加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。1.8之前HotSpot使用永久代的机制来实现方法区。运行时常量池（Runtime Constant Pool）是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述等信息外，还有一项信息是常量池（Constant Pool Table），用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后存放到方法区的运行时常量池中。
+</code></pre><p> 3）几个要注意的点：</p>
+<pre><code>a. class常量池：是在编译的时候每个class都有的，用于存放存放编译器生成的各种字面量和符号引用。字面量就是文本字符串和final常量等，符号引用主要包括类和接口的全限定名、字段的名称和描述符、方法的名称和描述符
+
+b. 运行时常量池：运行时常量池是方法区的一部分。Class 文件中的常量池（编译器生成的字面量和符号引用）会在类加载后被放入这个区域。除了在编译期生成的常量，还允许动态生成，如String的intern()方法。
+    还包括：基本类型包装类（包装类不管理浮点型，Integer缓存-128到127）
+
+c. 字符串常量池：经过类加载的验证，准备阶段之后在堆中生成字符串对象实例，然后将该字符串对象实例的引用值存到字符串常量池中。注意字符串常量池存储的是引用而不是string对象，对象在堆里。
+https://blog.csdn.net/qq_26222859/article/details/73135660
+https://www.cnblogs.com/natian-ws/p/10749164.html
+</code></pre><p> 4）直接内存、code cache、堆外内存</p>
+<pre><code>直接内存并不是JVM运行时数据区的一部分, 但也会被频繁的使用: 在jdk 1.4引入的NIO提供了基于Channel和Buffer的IO方式, 它可以使用Native函数库直接分配堆外内存, 然后使用DirectByteBuffer对象作为这块内存的引用进行操作,这样就避免了在Java堆和Native堆中来回复制数据,因此在一些场景中可以显著提高性能。
+
+更细致：NIO提供了直接操作内核空间的API，省去了内核空间和用户空间之间的一次数据拷贝。（直接内存映射IO，内核空间的 buffer 与 用户空间的 buffer 都映射到同一块物理内存区域。当用户进程访问“内存映射文件”地址时，自动产生缺页错误，然后由底层的OS负责将磁盘上的数据送到内存）。（在IO部分还会讲到，如DirectByteBuffer 与 HeapByteBuffer 的区别）
+</code></pre><p> 5）元空间meta space</p>
+<pre><code>a. java8移除永久代，引入元空间，将类的信息存放在元空间中。元空间并不在虚拟机中，而是使用本地内存。因此，默认情况下，元空间的大小仅受本地内存限制。类的元数据放入元空间,字符串池和类的静态变量放入java 堆中，这样可以加载多少类的元数据就不再由 MaxPermSize控制, 而由系统的实际可用空间来控制。 
+b. 方法区是JVM规范，永久代与元空间都是其一种实现方式。在 JDK 1.8之后，原来永久代的数据被分到了堆和元空间中。元空间存储类的元信息，静态变量和常量池等放入堆中。
+</code></pre></li>
+<li><p>JVM垃圾回收相关</p>
+<p> 1）第一点，首先要确定什么是垃圾。常见的两种回收算法是<strong>引用计数法</strong>和<strong>可达性分析法</strong>。<br>   a. 引用计数法：</p>
+<pre><code>引用计数法就是记录每一个对象被引用的次数。每当有一个对象引用到该对象，该对象的引用计数就加一，当某个引用不再指向该对象时，其引用计数减一。如果该对象的引用计数为零，那么它就变成了所谓的不可达对象，亦即可以被回收的。当该对象被回收后，它所引用的其它对象的引用计数都应该相应减少。
+
+关键：引用计数法无法解决**循环引用**的问题，即A、B两个对象互相持有对方的引用，将对方作为自己的引用变量，此时A、B均无法释放。
+</code></pre><p>   b. 可达性分析法：</p>
+<pre><code>从GC Root为起点开始遍历搜索，可达的对象都是存活的对象，如果GC Root到某个对象没有连通的路径，那么认为该对象是不可达的，可以被回收。JVM就是用这种算法来确定垃圾的。
+</code></pre><p> 2）几个注意点：</p>
+<pre><code>a. 对于用可达性分析法搜索不到的对象，GC并不一定会回收该对象。要完全回收一个对象，至少需要经过两次标记的过程。
+    第一次标记：对于一个没有其他引用的对象，筛选该对象是否有必要执行finalize()方法，如果没有执行必要，则意味可直接回收。（筛选依据：是否复写或执行过finalize()方法；因为finalize方法只能被执行一次）。
+    第二次标记：如果被筛选判定位有必要执行，则会放入FQueue队列，并自动创建一个低优先级的finalize线程来执行释放操作。如果在一个对象释放前被其他对象引用，则该对象会被移除FQueue队列。
+b. java中可作为GC Root的对象有：
+　　1. 虚拟机栈（本地变量表）中正在运行使用的引用，即当前正在执行的方法里的局部变量和输入参数
+　　2. 活动线程
+　　3. 内存中的静态字段（静态属性引用的对象）
+　　4. 内存中常量引用的对象
+　　5. 本地方法栈中JNI（即Native方法）引用的对象。
+c. 在标记阶段要暂停所有的应用线程，从而遍历对象的引用关系，这个叫stop the world.
+   可以安全地暂停线程的点叫做安全点 safe point
+d. 标记的是存活的对象，是可达的对象
+</code></pre><p> 3）垃圾收集算法</p>
+<pre><code>a. 标记清理：内存碎片化，需要使用空闲表来记录所有的空闲区域以及每个区域的大小。【回忆优缺点】
+b. 复制算法：内存分为AB两半，A满了之后把A中存活的复制到B上去，然后清理A。
+c. 标记整理：标记存活对象，清理垃圾内存，然后把存活的对象移动到内存空间的起始处
+</code></pre><p> 4）分代收集</p>
+<pre><code> a. 结合JVM内存模型来说，为什么要分代收集？JVM 堆分了新生代和老年代（1:2），新生代中分Eden区、Survivor From、Survivor To（8:1:1），不同的代对象出生死亡频率不同，可以针对不同年龄代的特点采用针对性回收算法，更加高效。
+ b. 新生代：复制算法（对象出生死亡频率很高，存活数量较少，用复制算法效率高）
+    老年代：标记整理算法
+
+这里还要了解一下分区收集算法，分区收集是将整个堆空间划分为连续的不同小区间, 每个小区间独立使用, 独立回收. 这样做的好处是可以控制一次回收多少个小区间 , 根据目标停顿时间, 每次合理地回收若干个小区间(而不是整个堆), 从而减少一次GC所产生的停顿。 
+
+对比：分代收集 vs 分区收集
+
+还需要了解一下方法区的回收，方法区主要是对常量池的回收和对类的卸载。这里回忆一下类的卸载条件。
+
+了解一下finalize()方法
+</code></pre><p> 5）Minor GC vs Major GC vs Full GC，以及各自的触发条件</p>
+<p> 6）垃圾收集器的类型</p>
+<pre><code>a. Serial收集器：它是单线程的收集器，使用复制算法，在进行垃圾收集的同时，必须暂停其他所有的工作线程，直到垃圾收集结束。它是Client场景下的默认新生代收集器。
+
+b. ParNew收集器：是Serial收集器的多线程版本，同样适用复制算法，是JVM运行在Server模式下默认的新生代收集器，在垃圾收集过程中同样也要暂停所有其他的工作线程。
+
+c. Parallel Scavenge收集器：多线程收集器，复制算法，其它收集器的目标是尽可能缩短垃圾收集时用户线程的停顿时间，而它重点关注的是是达到一个可控制的吞吐量（吞吐量=运行用户代码时间/(运行用户代码时间+垃圾收集时间)），因此它被称为“吞吐量优先”收集器。主要适用于在后台运算而不需要太多交互的任务。自适应调节策略也是 其收集器与ParNew收集器的一个重要区别。
+
+d. Serial Old收集器：是Serial收集器的老年代版本，同样是个单线程的收集器，使用标记-整理算法，也是给 Client模式下的虚拟机使用。
+
+e. Parallel Old 收集器：是Parallel Scavenge收集器的老年代版本。使用多线程的标记-整理算法，在JDK1.6开始提供。为了在年老代同样提供吞 吐量优先的垃圾收集器，如果系统对吞吐量要求比较高，可以优先考虑新生代Parallel Scavenge和年老代Parallel Old收集器的搭配策略
+
+f. CMS收集器：年老代垃圾收集器，其主要目标是缩短垃圾回收停顿时间，使用多线程来回收，使用标记清理算法，通过牺牲吞吐量来降低停顿时间，分为初始标记、并发标记、修正标记、并发清除四个阶段，在整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，不需要进行停顿。
+
+g. G1收集器：G1（Garbage-First），它是一款面向服务端应用的垃圾收集器，在多CPU和大内存的场景下有很好的性能。HotSpot 开发团队赋予它的使命是未来可以替换掉CMS收集器。堆被分为新生代和老年代，其它收集器进行收集的范围都是整个新生代或者老年代，而 G1 可以直接对新生代和老年代一起回收。
+    1. 基于标记-整理算法，不产生内存碎片。 
+    2. 可以非常**精确控制停顿时间**，在不牺牲吞吐量前提下，实现低停顿垃圾回收。G1收集器避免全区域垃圾收集，它**把堆内存划分为大小固定的几个独立区域**，并且跟踪这些区域的垃圾收集进度，同时在后台维护一个优先级列表，每次根据所允许的收集时间，优先回收垃圾多的区域。区域划分和优先级区域回收机制，确保G1收集器可以在有限时间获得高的垃圾收集效率。 
+
+Q：为什么G1可以精准stop the world？ 待了解...
+</code></pre></li>
+<li><p>类加载机制<br> 1）五个阶段：加载、验证、准备、解析、初始化，其中验证、准备、解析是连接过程。</p>
+<pre><code>这里要回忆一下各个阶段做的事情
+</code></pre><p> 2）类加载器：Boostrap ClassLoader、 Extension ClassLoader、 Application ClassLoader，这里要回忆一下三种类加载器负责加载的目录、常见的文件（如根加载器加载rt.jar）<br> 3）自定义classloader，继承ClassLoader类。<br> 4）双亲委派模型<br> 5）类加载顺序</p>
+<pre><code>父类（静态变量、静态语句块）
+子类（静态变量、静态语句块）
+父类（实例变量、普通语句块）
+父类（构造函数）
+子类（实例变量、普通语句块）
+子类（构造函数）
+</code></pre><p> 6）不会执行类初始化的情况   </p>
+<pre><code>a. 通过子类引用父类的静态字段，只会触发父类的初始化，而不会触发子类的初始化。
+b. 定义对象数组，不会触发该类的初始化。 
+c. 常量在编译期间会存入调用类的常量池中，本质上并没有直接引用定义常量的类，不会触发定义常量所在的类。 
+d. 通过类名获取Class对象，不会触发类的初始化。 
+e. 通过Class.forName加载指定类时，如果指定参数initialize为false时，也不会触发类初始化，其实这个参数是告诉虚拟机，是否要对类进行初始化。 
+f. 通过ClassLoader默认的loadClass方法，也不会触发初始化动作
+</code></pre><p> 7）获取class对象的三种方法？区别？</p>
+<pre><code>a. 对象.getClass()
+b. 类名.class
+c. Class.forName(&quot;完整的类路径&quot;);  获取Class对象(推荐使用)，可以用其实现工厂方法，传入class对象
+通过类名获取Class对象，不会触发类的初始化。 
+通过Class.forName加载指定类时，如果指定参数initialize为false时，也不会触发类初始化，其实这个参数是告诉虚拟机，是否要对类进行初始化。
+通过ClassLoader默认的loadClass方法，也不会触发初始化动作
+</code></pre><p> 8）反射（这里可以简单提一下）</p>
+<pre><code>1）获取成员变量：
+    a. getFields()：返回public公共变量
+    b. getDecalredFields()：返回public + private变量
+2）获取成员方法：
+    a. getMethods()；获取当前类public公共方法，以及父类的公共方法
+    b. getDecalredMethods()：获取当前类的所有方法，包括public 和private的
+3）获取class对象
+    a. 对象.getClass()
+    b. 类.class
+    c. Class.forName()
+</code></pre><p> 9）jar包冲突的原因及解决方案</p>
+<pre><code>1）同一个类，不同版本
+2）不同jar包下出现了同包名、同类名的类
+从双亲委派、maven依赖传递、类加载顺序、操作系统的文件系统加载顺序等角度来说，可以通过设置java xx -classpath的方式来设置某个jar包优先加载
+此外还可以提一下阿里的Arthas，定位一下这个类是由哪个jar包加载的（sm命令）
+</code></pre></li>
+<li><p>static变量<br> 1）首先说一下static变量的意义，static是java中的关键字，static修饰的方法或成员变量是属于类的，不属于某个对象的范畴，被static关键字修饰的方法或者变量不需要依赖于对象来进行访问，只要类被加载了，就可以通过类名去进行访问。<br> 2）然后说一下使用场景：</p>
+<pre><code>static关键字主要有以下四种使用场景：
+a. 修饰成员变量和成员方法: 
+    被static修饰的成员属于类，不属于单个这个类的某个对象，被类中所有对象共享，可以并且建议通过类名调用。
+    静态方法不依赖于任何对象就可以进行访问，在静态方法中不能访问类的非静态成员变量和非静态成员方法，因为非静态成员方法/变量都是必须依赖具体的对象才能够被调用。
+    被static声明的成员变量属于静态成员变量，静态变量存放在Java内存区域的方法区（1.8起在堆里）。静态变量被所有的对象所共享，在内存中只有一个副本，它当且仅当在类初次加载时会被初始化。而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响。
+　　static成员变量的初始化顺序按照定义的顺序进行初始化。
+
+b. 静态代码块: 静态代码块定义在类中方法外, 静态代码块在非静态代码块之前执行(静态代码块—&gt;非静态代码块—&gt;构造方法)。 该类不管创建多少对象，静态代码块只执行一次.
+
+c. 静态内部类（static修饰类的话只能修饰内部类）： 静态内部类与非静态内部类之间存在一个最大的区别: 非静态内部类在编译完成之后会隐含地保存着一个引用，该引用是指向创建它的外围类，但是静态内部类却没有。没有这个引用就意味着：1. 它的创建是不需要依赖外围类的创建。2. 它不能使用任何外围类的非static成员变量和方法。
+
+d. 静态导包(用来导入类中的静态资源，1.5之后的新特性): 格式为：import static 这两个关键字连用可以指定导入某个类中的指定静态资源，并且不需要使用类名调用类中静态成员，可以直接使用类中静态成员变量和成员方法。如
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> java.lang.System.out;  </span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> java.lang.Integer.*;</span><br><span class="line">out.println(MAX_VALUE);</span><br><span class="line">out.println(toHexString(<span class="number">42</span>));</span><br></pre></td></tr></table></figure>
+</code></pre><p> 3）几个注意点</p>
+<pre><code>a. static不能修饰局部变量
+b. static中不能用this、super，static方法内部不能调用非静态方法，反过来是可以的，这里解释一下原因（从属的范畴，有可能对象没有创建，使用类来访问静态方法，this对象还不存在）
+c. 静态变量、静态代码块、父子类结合 的初始化顺序。
+    注意：静态变量的声明是初始化是两个不同的操作，静态代码块对于定义在它之后的静态变量，可以赋值，但是不能访问。
+d. static变量存放的位置
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticDemo</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span></span><br><span class="line">    &#123;</span><br><span class="line">        num = <span class="number">20</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> num = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span></span><br><span class="line">    &#123;</span><br><span class="line">        System.out.println(num);</span><br><span class="line"><span class="comment">//        num = 30;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> StaticDemo();</span><br><span class="line">        <span class="keyword">new</span> StaticDemo();</span><br><span class="line">        System.out.println(num);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre></li>
+<li><p>final实现机制？<br> final关键字的可见性是指：被final修饰的字段在声明时或者构造器中，一旦初始化完成，那么在其他线程无须同步就能正确看见final字段的值。这是因为一旦初始化完成，final变量的值立刻回写到主内存。<br> 1）用法：</p>
+<pre><code>a. 修饰类：类不可被继承（例如String类、Math类、Integer类等）
+b. 修饰方法：方法不可被重写
+c. 修饰变量：包括成员变量和局部变量，该变量只能被赋值一次且它的值无法被改变，对于成员变量来讲，我们必须在声明时或者构造方法中对它赋值；
+</code></pre><p> 2）被final修饰的变量在编译阶段会被放入常量池中，<br> 3）匿名内部类在使用外部类的局部变量时，只能使用被final修饰的变量，或者是显式final的<br> 4）写final域的重排序规则：JMM禁止编译器把final域的写重排序到构造函数之外；编译器在final域写之后，构造函数return之前，插入一个storestore屏障，这个屏障可以禁止处理器把final域的写操作重排序到构造函数之外。这样可以保证在对象引用为任何线程可见之前，对象的final域已经被正确初始化了，而普通域则不具有这个保障。<br> 5）读final域的重排序规则：处理器会在读final域操作之前，插入一个LoadLoad屏障，禁止对初次读对象引用和初次读对象的final域这个两个操作的重排序。</p>
+</li>
+<li><p>拼接字符串的方式<br> 1）StringBuffer：线程安全<br> 2）StringBuilder：非线程安全<br> 3）String.join() [jdk8]<br> 4）StringJoiner.join() [jdk8]<br> 5）Stream + Collectors.joining() [jdk8]<br> 6）StringUtils.join() [Apache Commons Lang3]<br> 7）通过java.text.MessageFormat.format<br> 8）ThreadLocal + StringBuilder，实现高性能且线程安全的字符串拼接<br> 注意，在循环中不要用+来拼接字符串，因为编译器会多次反复生成StringBuilder对象（java8默认用stringbuilder）来拼接字符串，效率较低。</p>
+</li>
+<li><p>接口 vs 抽象类</p>
+</li>
+<li><p>枚举的底层实现<br> 还可以提一下，用枚举可以实现安全的单例模式</p>
+</li>
+<li><p>序列化<br> 1）序列化就是将一个对象转换成字节序列，方便存储和传输。</p>
+<pre><code>+ 序列化：ObjectOutputStream.writeObject()
++ 反序列化：ObjectInputStream.readObject()
+</code></pre><p> 2）序列化的类需要实现Serializable接口，它只是一个标准，没有任何方法需要实现，但是如果不去实现它的话而进行序列化，会抛出异常。<br> 3）static修饰的成员变量（因为序列化只是保存对象的状态，静态变量属于类的状态）、transient修饰的成员变量，都不会被序列化<br> 4）可以提一下，平时用ObjectMapper或者FastJSON，通过序列化来实现Dto 和 Po之间的转化，深度拷贝</p>
+</li>
+<li><p>int的范围：[-2^31，2^31-1] <a href="https://blog.csdn.net/qfikh/article/details/52832087" target="_blank" rel="noopener">https://blog.csdn.net/qfikh/article/details/52832087</a><br>字节大小：<br>byte     1字节<br>short    2字节<br>int      4字节<br>long     8字节<br>char     2字节（C语言中是1字节）可以存储一个汉字<br>float    4字节<br>double   8字节<br>boolean  false/true(理论上占用1bit,1/8字节，实际处理按1byte处理)  </p>
+</li>
+</ol>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a class="article-share-link" data-url="https://dcrunnn.github.io/2020/04/01/春招积累-Java基础篇/" data-id="ck8ss1zkr0013c0ubxhzdkump" data-qrcode="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACt0lEQVR42u3aQW7bQAwF0Nz/0i2QVYHW1v/kTJICTytDgGU9LoY0yY+P+Pr1ef35Obn+fkL+reSZxy48PDy80asnP/aendxJ8O1zHkKAh4eHd423SQYz8Pvj/n1Q8nDj4eHhfS+vTSd5fZtXxXh4eHj/F29T8ibUJJR4eHh4P4e3b6rmbdY96UqvBQ8PD29S8RYDsO/9fH2+h4eHhzeaqs/K4jypJEX56m3x8PDwLvDykdX7wX/eaMif064gvHwaHh4e3lFeexBvkG3pnPzuQyMYDw8P7zIvObjbhapZk3fTtP3HPwY8PDy8C7zZQkC+SrUZquWBe+i14OHh4V3g5Qfu+3SSJ4O2TVynGTw8PLwv5OWl7akVqP0GxMs2Lh4eHt5R3qZs3bQnrjRtEyQeHh7emjcrZ2fDrXw969iYDQ8PD+8Cry1YZ6S21duuMszWwvDw8PBmvLbMnQ2iNkX2Khng4eHhfSFvc9Dvi+a28fEyEHh4eHgXePmxnqwL5Ad628BtVxOKWR8eHh5eyZu1PtvXyp/fBujhDwAeHh7eNV7SEk0Cka9btcmjDW4938PDw8OLeftVgLy9m4/B8qZwXvrj4eHh3ePN2rt5sNo7h9eq8PDw8Na8du2pfa3NokDbPo6WrvDw8PAO8U4h23FangCGwzA8PDy8a7y2/kyasPuFqiRYDxY8PDy8C7wcNmtP5AmmDU0xWsPDw8M7ymsH8LPieJZIku8+IPHw8PAu8/LGQfsS+dNma1UvExUeHh7eBd5msSC/097fFOvDdIKHh4dX8tpkkDQIVoOrQwkDDw8P7zZvkwzyErkttfMMhoeHh/czefnxvWlG5A3lw4kBDw8P78t5bZNiFqCE93LpCg8PD+8ob1/gtk3Y2disTTx4eHh4N3jtAGzTnigO9LKUX114eHh4Ke83+SzQdTezeJ8AAAAASUVORK5CYII=">分享</a><div class="tags"><a href="/tags/Java/">Java</a><a href="/tags/面试积累/">面试积累</a></div><div class="post-nav"><a class="pre" href="/2020/04/02/春招积累-Java集合篇/">春招积累 | Java集合篇</a><a class="next" href="/2020/02/26/JavaDaily/">JavaDaily</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"><input type="hidden" name="si" value="https://dcrunnn.github.io"><input name="tn" type="hidden" value="bds"><input name="cl" type="hidden" value="3"><input name="ct" type="hidden" value="2097152"><input name="s" type="hidden" value="on"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/">Java</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Java/SpringBoot/">SpringBoot</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/LeetCode/">LeetCode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Maven/">Maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Vue/">Vue</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/人工智能与机器学习/">人工智能与机器学习</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/大数据/">大数据</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/心情/">心情</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/">技术整理</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/技术整理/Windows/">Windows</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据库/">数据库</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/数据结构与算法/">数据结构与算法</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/设计模式/">设计模式</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/">读书笔记</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/读书笔记/编程规范/">编程规范</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/面试积累/">面试积累</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/vue/" style="font-size: 15px;">vue</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/Enum/" style="font-size: 15px;">Enum</a> <a href="/tags/Java8/" style="font-size: 15px;">Java8</a> <a href="/tags/Stream/" style="font-size: 15px;">Stream</a> <a href="/tags/参数传递/" style="font-size: 15px;">参数传递</a> <a href="/tags/心情/" style="font-size: 15px;">心情</a> <a href="/tags/设计模式/" style="font-size: 15px;">设计模式</a> <a href="/tags/数据结构与算法/" style="font-size: 15px;">数据结构与算法</a> <a href="/tags/算法/" style="font-size: 15px;">算法</a> <a href="/tags/LeetCode/" style="font-size: 15px;">LeetCode</a> <a href="/tags/SpringBoot/" style="font-size: 15px;">SpringBoot</a> <a href="/tags/前后端分离/" style="font-size: 15px;">前后端分离</a> <a href="/tags/SpringSecurity/" style="font-size: 15px;">SpringSecurity</a> <a href="/tags/jwt/" style="font-size: 15px;">jwt</a> <a href="/tags/多线程/" style="font-size: 15px;">多线程</a> <a href="/tags/技术/" style="font-size: 15px;">技术</a> <a href="/tags/数据恢复/" style="font-size: 15px;">数据恢复</a> <a href="/tags/MySQL/" style="font-size: 15px;">MySQL</a> <a href="/tags/学习记录/" style="font-size: 15px;">学习记录</a> <a href="/tags/编程/" style="font-size: 15px;">编程</a> <a href="/tags/优化/" style="font-size: 15px;">优化</a> <a href="/tags/知识/" style="font-size: 15px;">知识</a> <a href="/tags/webpack/" style="font-size: 15px;">webpack</a> <a href="/tags/阿里云镜像/" style="font-size: 15px;">阿里云镜像</a> <a href="/tags/大数据/" style="font-size: 15px;">大数据</a> <a href="/tags/人工智能与机器学习/" style="font-size: 15px;">人工智能与机器学习</a> <a href="/tags/分布式ETL工具/" style="font-size: 15px;">分布式ETL工具</a> <a href="/tags/分布式SQL引擎/" style="font-size: 15px;">分布式SQL引擎</a> <a href="/tags/分布式数据采集工具/" style="font-size: 15px;">分布式数据采集工具</a> <a href="/tags/分布式消息队列/" style="font-size: 15px;">分布式消息队列</a> <a href="/tags/分布式文件系统/" style="font-size: 15px;">分布式文件系统</a> <a href="/tags/面试积累/" style="font-size: 15px;">面试积累</a> <a href="/tags/分布式计算框架/" style="font-size: 15px;">分布式计算框架</a> <a href="/tags/分布式资源管理框架/" style="font-size: 15px;">分布式资源管理框架</a> <a href="/tags/内存模型/" style="font-size: 15px;">内存模型</a> <a href="/tags/线程池/" style="font-size: 15px;">线程池</a> <a href="/tags/数据结构/" style="font-size: 15px;">数据结构</a> <a href="/tags/字符串/" style="font-size: 15px;">字符串</a> <a href="/tags/Lambda/" style="font-size: 15px;">Lambda</a> <a href="/tags/滑动窗口/" style="font-size: 15px;">滑动窗口</a> <a href="/tags/矩阵/" style="font-size: 15px;">矩阵</a> <a href="/tags/歌曲/" style="font-size: 15px;">歌曲</a> <a href="/tags/编程规范/" style="font-size: 15px;">编程规范</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/04/02/春招积累-Java集合篇/">春招积累 | Java集合篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/01/春招积累-Java基础篇/">春招积累 | Java基础篇</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/26/JavaDaily/">JavaDaily</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/01/05/《Java8实战》-Chapter3-Lambda表达式/">《Java8实战》| Chapter3 Lambda表达式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/19/《Java8实战》-Chapter2 通过行为参数化传递代码/">《Java8实战》 | Chapter2 通过行为参数化传递代码</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/18/记一次右键菜单失效修复注册表的过程/">记一次右键菜单失效修复注册表的过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/18/《Java8实战》-Chapter1 为什么要关心Java8/">《Java8实战》 | Chapter1 为什么要关心Java8</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/12/人工智能与机器学习概述/">人工智能与机器学习概述</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/06/设计模式理论篇-模板方法模式/">设计模式理论篇 | 模板方法模式</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/12/02/大数据理论篇-分布式SQL引擎Inceptor/">大数据理论篇 | 分布式SQL引擎Inceptor</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 链接</i></div><ul></ul><a href="http://www.github.com/DCRUNNN" title="Github" target="_blank">Github</a><ul></ul><a href="https://instagram.com/youdontknowdc" title="Instagram" target="_blank">Instagram</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/." rel="nofollow">Blog of DC.</a><!--|  Powered by--><!--a(rel='nofollow', target='_blank', href='https://hexo.io')  Hexo.--><!--a(rel='nofollow', target='_blank', href='https://github.com/tufu9441/maupassant-hexo')  Theme--><!--|  by--><!--a(rel='nofollow', target='_blank', href='https://github.com/pagecho')  Cho.--></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
